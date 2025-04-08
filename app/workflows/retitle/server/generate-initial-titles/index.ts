@@ -7,6 +7,7 @@ import { aiModelList } from "@/lib/ai/models/list";
 import { getModelSettings, modelRegistry } from "@/lib/ai/models/registry";
 import { getSERPResults } from "@/lib/ai/tools/serp-results";
 import { writeProviderRawRequestToFile } from "@/lib/ai/utils";
+import { getUserData } from "@/lib/auth";
 import { MAX_RETITLE_GENERATIONS_PER_DAY } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { getURLsFromText } from "@/utils/misc";
@@ -28,6 +29,8 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 		);
 	}
 
+	const userData = await getUserData(userId);
+
 	let usage = await db.usage.findUnique({
 		where: { userId },
 		select: { retitleGenerations: true },
@@ -41,7 +44,10 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 		});
 	}
 
-	if (usage.retitleGenerations >= MAX_RETITLE_GENERATIONS_PER_DAY) {
+	if (
+		usage.retitleGenerations >= MAX_RETITLE_GENERATIONS_PER_DAY &&
+		userData.privateMetadata.role !== "admin"
+	) {
 		return Response.json(
 			{
 				status: "error",
