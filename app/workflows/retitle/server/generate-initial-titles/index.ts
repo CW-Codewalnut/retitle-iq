@@ -235,6 +235,8 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 				},
 			});
 
+			void result.consumeStream();
+
 			result.mergeIntoDataStream(dataStream);
 		},
 	});
