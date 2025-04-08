@@ -7,6 +7,7 @@ import { aiModelList } from "@/lib/ai/models/list";
 import { getModelSettings, modelRegistry } from "@/lib/ai/models/registry";
 import { getSERPResults } from "@/lib/ai/tools/serp-results";
 import { writeProviderRawRequestToFile } from "@/lib/ai/utils";
+import { MAX_RETITLE_GENERATIONS_PER_DAY } from "@/lib/constants";
 import { db } from "@/lib/db";
 import { getURLsFromText } from "@/utils/misc";
 
@@ -26,6 +27,38 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 			{ status: 401 },
 		);
 	}
+
+	let usage = await db.usage.findUnique({
+		where: { userId },
+		select: { retitleGenerations: true },
+	});
+
+	// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+	if (!usage) {
+		usage = await db.usage.create({
+			data: { userId },
+			select: { retitleGenerations: true },
+		});
+	}
+
+	if (usage.retitleGenerations >= MAX_RETITLE_GENERATIONS_PER_DAY) {
+		return Response.json(
+			{
+				status: "error",
+				message: "You have reached the maximum number of retitling per day",
+			},
+			{ status: 429 },
+		);
+	}
+
+	await db.usage.update({
+		where: { userId },
+		data: {
+			retitleGenerations: {
+				increment: 1,
+			},
+		},
+	});
 
 	const id = actionArgs.params.id;
 	const input = (await actionArgs.request.json()) as unknown;
@@ -180,6 +213,17 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 					await db.chat.delete({
 						where: {
 							id: chatId,
+						},
+					});
+
+					await db.usage.update({
+						where: {
+							userId,
+						},
+						data: {
+							retitleGenerations: {
+								decrement: 1,
+							},
 						},
 					});
 				},

@@ -21,6 +21,17 @@ enum ChatCategory {
 }
 
 // models
+
+model Usage {
+  id        String   @id @default(uuid(7))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // clerk userid
+  userId             String @unique
+  retitleGenerations Int    @default(0)
+}
+
 model Chat {
   id        String   @id @default(uuid(7))
   createdAt DateTime @default(now())
