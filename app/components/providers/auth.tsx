@@ -9,8 +9,6 @@ export function AuthProvider(props: AuthProviderProps) {
 	return (
 		<ClerkProvider
 			{...props}
-			signUpUrl="/"
-			signInUrl="/sign-in"
 			appearance={{
 				layout: {
 					unsafe_disableDevelopmentModeWarnings: true,
