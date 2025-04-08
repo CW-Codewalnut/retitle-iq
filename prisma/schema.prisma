@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// enums
+enum MessageRole {
+  user
+  assistant
+}
+
+enum ChatCategory {
+  retitle
+}
+
+// models
+model Chat {
+  id        String   @id @default(uuid(7))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  title    String
+  messages Message[]
+  category ChatCategory
+  userId   String
+}
+
+model Message {
+  id        String   @id @default(uuid(7))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  role        MessageRole
+  content     String
+  files       FileUpload[]
+  reasoning   String?
+  annotations Json?
+  model       String
+
+  chatId String
+  chat   Chat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+}
+
+model FileUpload {
+  id        String   @id @default(uuid(7))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name     String
+  url      String
+  mimeType String
+  userId   String
+
+  messageId String?
+  message   Message? @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+model SerpResult {
+  id        String   @id @default(uuid(7))
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  query   String
+  results Json
+}
