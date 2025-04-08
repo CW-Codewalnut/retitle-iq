@@ -20,7 +20,7 @@ export function RetitleLanding(props: RetitleLandingProps) {
 			</SignedIn>
 			<SignedOut>
 				<div className="grid h-full place-items-center">
-					<SignUp oauthFlow="popup" />
+					<SignUp oauthFlow="popup" signInUrl="/sign-in" />
 				</div>
 			</SignedOut>
 		</>
