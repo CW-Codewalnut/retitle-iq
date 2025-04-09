@@ -1,4 +1,4 @@
-import { ClerkLoading, SignedIn, SignedOut, SignUp } from "@clerk/react-router";
+import { ClerkLoading, SignedIn } from "@clerk/react-router";
 import { LoaderIcon } from "lucide-react";
 
 import { RetitleLandingComp } from "./landing";
@@ -18,11 +18,6 @@ export function RetitleLanding(props: RetitleLandingProps) {
 			<SignedIn>
 				<RetitleLandingComp {...props} />
 			</SignedIn>
-			<SignedOut>
-				<div className="grid h-full place-items-center">
-					<SignUp oauthFlow="popup" signInUrl="/sign-in" />
-				</div>
-			</SignedOut>
 		</>
 	);
 }
