@@ -5,7 +5,7 @@ export default function SignUpPage() {
 	return (
 		<div className="grid h-svh place-items-center">
 			<ClerkLoaded>
-				<SignUp oauthFlow="popup" signInUrl="/sign-in" />
+				<SignUp signInUrl="/sign-in" />
 			</ClerkLoaded>
 			<ClerkLoading>
 				<LoaderIcon className="animate-spin" />
