@@ -1,11 +1,11 @@
-import { ClerkLoaded, ClerkLoading, SignIn } from "@clerk/react-router";
+import { ClerkLoaded, ClerkLoading, SignUp } from "@clerk/react-router";
 import { LoaderIcon } from "lucide-react";
 
-export default function SignInPage() {
+export default function SignUpPage() {
 	return (
 		<div className="grid h-svh place-items-center">
 			<ClerkLoaded>
-				<SignIn transferable oauthFlow="popup" signUpUrl="/sign-up" />
+				<SignUp oauthFlow="popup" signInUrl="/sign-in" />
 			</ClerkLoaded>
 			<ClerkLoading>
 				<LoaderIcon className="animate-spin" />
