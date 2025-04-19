@@ -1,7 +1,6 @@
 import type { Prisma } from "@prisma/client";
 
-import type { GetSerpResultsParams } from "@/lib/ai/tools/serp-results/types";
-
+import type { GetSerpResultsParams } from "../serp-results/types";
 import type {
 	GoogleSearchAPIResponse,
 	GoogleSearchAPIResultItem,

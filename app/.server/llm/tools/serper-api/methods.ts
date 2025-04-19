@@ -1,5 +1,4 @@
-import type { GetSerpResultsParams } from "@/lib/ai/tools/serp-results/types";
-
+import type { GetSerpResultsParams } from "../serp-results/types";
 import type { SerperAPIResponse } from "./types";
 
 const baseURL = "https://google.serper.dev/search";

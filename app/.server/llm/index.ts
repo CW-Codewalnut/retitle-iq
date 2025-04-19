@@ -2,10 +2,10 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { openrouter } from "@openrouter/ai-sdk-provider";
-import type { LanguageModel, ProviderMetadata } from "ai";
+import type { LanguageModel as LanguageModelV1, ProviderMetadata } from "ai";
 import { customProvider } from "ai";
 
-import type { AIModel } from "./list";
+import type { LanguageModel } from "@/utils/llm";
 
 export const modelRegistry = customProvider({
 	languageModels: {
@@ -75,11 +75,11 @@ export const modelRegistry = customProvider({
 				exclude: false,
 			},
 		}),
-	} satisfies Record<AIModel, LanguageModel>,
+	} satisfies Record<LanguageModel, LanguageModelV1>,
 });
 
 export function getModelSettings(
-	model: AIModel,
+	model: LanguageModel,
 	structuredOutputs = false,
 ): {
 	providerOptions: ProviderMetadata;
@@ -113,18 +113,6 @@ export function getModelSettings(
 			providerOptions: {
 				openai: {
 					structuredOutputs,
-				},
-			},
-		};
-	}
-
-	if (model.includes("o3-mini")) {
-		const effort = model.split("-")[2];
-
-		return {
-			providerOptions: {
-				openai: {
-					reasoningEffort: effort,
 				},
 			},
 		};

@@ -8,9 +8,9 @@ type AppProvidersProps = {
 
 export function AppProviders({ authLoaderData, children }: AppProvidersProps) {
 	return (
-		<AuthProvider loaderData={authLoaderData}>
-			{children}
+		<>
+			<AuthProvider loaderData={authLoaderData}>{children}</AuthProvider>
 			<Toaster />
-		</AuthProvider>
+		</>
 	);
 }

@@ -6,18 +6,18 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { aiModelList, defaultAIModel } from "@/lib/ai/models/list";
+import { defaultLanguageModel, languageModelOptions } from "@/utils/llm";
 
 export function ModelPicker() {
 	return (
 		<div className="flex flex-col gap-2">
 			<Label htmlFor="model">Model</Label>
-			<Select name="model" defaultValue={defaultAIModel}>
+			<Select name="model" defaultValue={defaultLanguageModel}>
 				<SelectTrigger id="model" className="w-full">
 					<SelectValue />
 				</SelectTrigger>
 				<SelectContent>
-					{aiModelList.map((item) => (
+					{languageModelOptions.map((item) => (
 						<SelectItem key={item.id} value={item.id}>
 							{item.name}
 						</SelectItem>

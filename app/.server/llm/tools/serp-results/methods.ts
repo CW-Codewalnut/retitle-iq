@@ -1,10 +1,11 @@
 import type { Prisma } from "@prisma/client";
 
-import { getGoogleSearchResults } from "@/lib/ai/tools/google-cse-api";
-import type { SerpResultsProvider } from "@/lib/ai/tools/serp-results/types";
-import { getSerperResults } from "@/lib/ai/tools/serper-api";
-import { SERP_CACHE_DURATION_HOURS } from "@/lib/constants";
-import { db } from "@/lib/db";
+import { db } from "@/.server/db";
+import { SERP_CACHE_DURATION_HOURS } from "@/utils/constants";
+
+import { getGoogleSearchResults } from "../google-cse-api";
+import { getSerperResults } from "../serper-api";
+import type { SerpResultsProvider } from "./types";
 
 export async function getSERPResults(
 	query: string,

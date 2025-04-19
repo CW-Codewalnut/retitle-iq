@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const aiModels = [
+export const languageModels = [
 	"gemini-2.0-flash",
 	"gemini-2.0-flash-lite",
 	"gemini-2.0-flash-thinking",
@@ -24,18 +24,20 @@ export const aiModels = [
 	"deepseek-r1",
 ] as const;
 
-export type AIModel = (typeof aiModels)[number];
+export type LanguageModel = (typeof languageModels)[number];
 
-export const defaultAIModel = "gemini-2.0-flash" satisfies AIModel;
-export const aiModelSchema = z.enum(aiModels).catch(defaultAIModel);
+export const defaultLanguageModel = "gemini-2.0-flash" satisfies LanguageModel;
+export const languageModelSchema = z
+	.enum(languageModels)
+	.catch(defaultLanguageModel);
 
 export type ModelOption = {
-	id: AIModel;
+	id: LanguageModel;
 	name: string;
 	thinking?: boolean;
 };
 
-export const aiModelList = [
+export const languageModelOptions = [
 	{
 		id: "gemini-2.0-flash",
 		name: "Gemini 2.0 Flash",
