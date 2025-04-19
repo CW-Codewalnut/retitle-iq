@@ -17,6 +17,8 @@ export const languageModels = [
 	"gpt-4.1",
 	"gpt-4.1-mini",
 
+	"grok-3-mini",
+
 	"deepseek-v3",
 	"deepseek-r1",
 ] as const;
@@ -89,6 +91,11 @@ export const languageModelOptions = [
 	{
 		id: "gpt-4.1-mini",
 		name: "GPT-4.1 Mini",
+	},
+	{
+		id: "grok-3-mini",
+		name: "Grok 3 Mini",
+		thinking: true,
 	},
 	{
 		id: "deepseek-v3",
