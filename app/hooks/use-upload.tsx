@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-import type { ValidateUserUploadsParams } from "@/utils/client/uploads";
-import {
-	getDataURLFromFile,
-	validateUserUploads,
-} from "@/utils/client/uploads";
 import type { UserUpload } from "@/utils/types";
+import type { ValidateUserUploadsParams } from "@/utils/uploads";
+import { getDataURLFromFile, validateUserUploads } from "@/utils/uploads";
 
 type UseUploadParams = Pick<
 	ValidateUserUploadsParams,

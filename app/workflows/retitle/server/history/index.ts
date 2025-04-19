@@ -1,8 +1,8 @@
 import { getAuth } from "@clerk/react-router/ssr.server";
 import type { LoaderFunctionArgs } from "react-router";
 
-import { db } from "@/lib/db";
-import { getInfiniteAPIParams } from "@/utils/server";
+import { db } from "@/.server/db";
+import { getInfiniteAPIParams } from "@/.server/utils";
 import type { InfiniteAPIResponse } from "@/utils/types";
 
 export async function getRetitleChatHistory(loaderArgs: LoaderFunctionArgs) {

@@ -3,11 +3,11 @@ import { Button } from "@/components/ui/button";
 import { FileDropZone } from "@/components/ui/file-drop-zone";
 import { UploadPreview } from "@/components/ui/upload-preview";
 import { useUpload } from "@/hooks/use-upload";
-import type { AIModel } from "@/lib/ai/models/list";
 import {
 	BLOG_FILE_VALID_EXTENSIONS,
 	CHAT_FILE_MAX_SIZE,
-} from "@/lib/constants";
+} from "@/utils/constants";
+import type { LanguageModel } from "@/utils/llm";
 
 import type { RetitleInput } from "../../utils/types";
 import { FormContentInput } from "./content";
@@ -33,7 +33,7 @@ export function RetitleForm({ onSubmit }: RetitleFormProps) {
 
 		const keyword = formData.get("keyword") as string;
 		const content = formData.get("content") as string;
-		const model = formData.get("model") as unknown as AIModel;
+		const model = formData.get("model") as unknown as LanguageModel;
 
 		if (keyword && model && (content || blogUpload)) {
 			if (blogUpload) {

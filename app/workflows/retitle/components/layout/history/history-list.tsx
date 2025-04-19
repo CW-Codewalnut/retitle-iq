@@ -7,7 +7,7 @@ import {
 	SidebarMenuSkeleton,
 } from "@/components/ui/sidebar";
 import { useInfiniteList } from "@/hooks/use-infinite-list";
-import { RETITLE_ROUTE } from "@/lib/constants";
+import { RETITLE_ROUTE } from "@/utils/constants";
 
 type ChatHistoryItem = {
 	id: string;

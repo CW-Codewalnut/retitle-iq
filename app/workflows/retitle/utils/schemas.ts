@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-import { aiModelSchema } from "@/lib/ai/models/list";
+import { languageModelSchema } from "@/utils/llm";
 
 export const retitleInputSchema = z
 	.object({
 		keyword: z.string(),
-		model: aiModelSchema,
+		model: languageModelSchema,
 	})
 	.and(
 		z.discriminatedUnion("type", [

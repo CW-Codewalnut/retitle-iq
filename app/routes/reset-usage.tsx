@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from "react-router";
 
-import { db } from "@/lib/db";
+import { db } from "@/.server/db";
 
 const CRON_TOKEN = process.env.CRON_TOKEN;
 

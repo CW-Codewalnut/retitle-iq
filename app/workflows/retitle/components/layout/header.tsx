@@ -3,7 +3,7 @@ import { Link } from "react-router";
 
 import { IconButton } from "@/components/ui/icon-button";
 import { useSidebar } from "@/components/ui/sidebar";
-import { RETITLE_ROUTE } from "@/lib/constants";
+import { RETITLE_ROUTE } from "@/utils/constants";
 
 export function RetitleHeader() {
 	const { open, isMobile, toggleSidebar } = useSidebar();

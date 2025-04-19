@@ -4,7 +4,7 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useSWRConfig } from "swr";
 
-import { RETITLE_ROUTE } from "@/lib/constants";
+import { RETITLE_ROUTE } from "@/utils/constants";
 
 import { getRetitleFirstUserMessage } from "../../utils/methods";
 import type { RetitleInput } from "../../utils/types";

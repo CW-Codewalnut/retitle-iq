@@ -3,13 +3,12 @@ import type { CoreMessage, JSONValue, UserContent } from "ai";
 import { createDataStreamResponse, streamText } from "ai";
 import type { ActionFunctionArgs } from "react-router";
 
-import { aiModelList } from "@/lib/ai/models/list";
-import { getModelSettings, modelRegistry } from "@/lib/ai/models/registry";
-import { getSERPResults } from "@/lib/ai/tools/serp-results";
-import { writeProviderRawRequestToFile } from "@/lib/ai/utils";
-import { getUserData } from "@/lib/auth";
-import { MAX_RETITLE_GENERATIONS_PER_DAY } from "@/lib/constants";
-import { db } from "@/lib/db";
+import { getUserData } from "@/.server/auth";
+import { db } from "@/.server/db";
+import { getModelSettings, modelRegistry } from "@/.server/llm";
+import { getSERPResults } from "@/.server/llm/tools";
+import { MAX_RETITLE_GENERATIONS_PER_DAY } from "@/utils/constants";
+import { languageModelOptions } from "@/utils/llm";
 import { getURLsFromText } from "@/utils/misc";
 
 import { getRetitleFirstUserMessage } from "../../utils/methods";
@@ -144,7 +143,7 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 
 	const chatId = newChat.id;
 
-	const modelInfo = aiModelList.find((m) => m.id === model);
+	const modelInfo = languageModelOptions.find((m) => m.id === model);
 
 	const extraData = {
 		model: modelInfo?.name ?? null,
@@ -208,7 +207,6 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 						},
 					});
 
-					writeProviderRawRequestToFile(data.request);
 					console.log("Stream Finish initial titles", chatId);
 					console.log("Usage", data.usage);
 				},

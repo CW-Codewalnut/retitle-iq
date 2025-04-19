@@ -1,6 +1,6 @@
-import { getURLContent } from "@/lib/headless-browser";
-import { uploadFileToStorage } from "@/lib/storage";
-import { convertToPDF, parseUserUpload } from "@/utils/server/uploads";
+import { getURLContent } from "@/.server/headless-browser";
+import { uploadFileToStorage } from "@/.server/storage";
+import { convertToPDF, parseUserUpload } from "@/.server/uploads";
 import type { UserUpload } from "@/utils/types";
 
 export async function uploadBlogFromURL(blogURL: string) {

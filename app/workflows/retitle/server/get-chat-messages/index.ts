@@ -1,9 +1,9 @@
 import type { LoaderFunctionArgs } from "react-router";
 import { redirect } from "react-router";
 
-import { RETITLE_ROUTE } from "@/lib/constants";
-import { db } from "@/lib/db";
-import { getUIMessagesFromDBMessages } from "@/utils/server/messages";
+import { db } from "@/.server/db";
+import { getUIMessagesFromDBMessages } from "@/.server/llm/messages";
+import { RETITLE_ROUTE } from "@/utils/constants";
 
 export async function getChatMessages(loaderArgs: LoaderFunctionArgs) {
 	const chatId = loaderArgs.params.id;
