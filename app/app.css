@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-
-@custom-variant dark (&:is(.dark *));
+@plugin "@tailwindcss/typography";
 
 @theme {
 	--font-sans: "Inter Variable", sans-serif;
@@ -154,60 +153,5 @@
 
 	.cl-userButton-root .cl-button .cl-userButtonBox {
 		@apply !w-full !justify-between;
-	}
-}
-
-.prose {
-	h1 {
-		@apply scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl;
-	}
-
-	h2 {
-		@apply mt-10 scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0;
-	}
-
-	h3 {
-		@apply mt-8 scroll-m-20 text-2xl font-semibold tracking-tight first:mt-0;
-	}
-
-	h4 {
-		@apply mt-6 scroll-m-20 text-xl font-semibold tracking-tight first:mt-0;
-	}
-
-	p {
-		@apply leading-7 [&:not(:first-child)]:mt-4;
-	}
-
-	blockquote {
-		@apply mt-6 border-l-2 pl-6 italic;
-	}
-
-	small {
-		@apply text-sm leading-none font-medium;
-	}
-
-	a {
-		@apply text-primary font-medium underline underline-offset-4;
-	}
-
-	ul,
-	ol {
-		@apply my-4 ml-6 list-disc [&>li]:mt-2;
-	}
-
-	table {
-		@apply my-6 w-full border-collapse overflow-y-auto;
-	}
-
-	th {
-		@apply border px-4 py-2 text-left font-bold;
-	}
-
-	td {
-		@apply border px-4 py-2 text-left;
-	}
-
-	tr:nth-child(even) {
-		@apply bg-muted;
 	}
 }

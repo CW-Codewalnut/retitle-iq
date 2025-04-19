@@ -11,7 +11,12 @@ type MarkdownProps = {
 
 export function Markdown({ children, className }: MarkdownProps) {
 	return (
-		<div className={cn("prose", className)}>
+		<div
+			className={cn(
+				"prose prose-zinc prose-pre:whitespace-pre-wrap prose-pre:bg-transparent prose-pre:text-foreground max-w-none",
+				className,
+			)}
+		>
 			<ReactMarkdown {...reactMarkdownProps}>{children}</ReactMarkdown>
 		</div>
 	);
