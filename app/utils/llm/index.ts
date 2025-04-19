@@ -16,6 +16,7 @@ export const languageModels = [
 	"chatgpt-4o",
 	"gpt-4.1",
 	"gpt-4.1-mini",
+	"o4-mini",
 
 	"grok-3-mini",
 
@@ -91,6 +92,11 @@ export const languageModelOptions = [
 	{
 		id: "gpt-4.1-mini",
 		name: "GPT-4.1 Mini",
+	},
+	{
+		id: "o4-mini",
+		name: "o4 Mini",
+		thinking: true,
 	},
 	{
 		id: "grok-3-mini",

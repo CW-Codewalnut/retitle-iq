@@ -59,6 +59,10 @@ export const modelRegistry = customProvider({
 
 		"gpt-4.1-mini": openrouter("openai/gpt-4.1-mini"),
 
+		"o4-mini": openrouter("openai/o4-mini", {
+			reasoningEffort: "medium",
+		}),
+
 		"grok-3-mini": openrouter("x-ai/grok-3-mini-beta", {
 			reasoningEffort: "medium",
 		}),
