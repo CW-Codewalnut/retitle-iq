@@ -1,87 +1,175 @@
-# Welcome to React Router!
+# ReTitleIQ
 
-A modern, production-ready template for building full-stack React applications using React Router.
+ReTitleIQ is a web application built with React, Vite, and React Router 7 designed to help users generate highly effective, SEO-optimized titles for their blog posts using Large Language Models (LLMs). It analyzes user-provided content, keyword, leverages competitor data from SERP results, and applies sophisticated prompting techniques to suggest multiple compelling title options.
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## Overview
 
-## Features
+Writing blog titles that rank well on search engines and entice humans to click is challenging. ReTitleIQ aims to simplify this process by:
 
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+1.  **Understanding Your Content:** Accepts blog content via direct text input, URL fetching, or file uploads (supporting Markdown, Text, PDF, DOCX).
+2.  **Analyzing Competition:** Fetches real-time Search Engine Results Page (SERP) data for your primary keyword to understand what's already ranking.
+3.  **Leveraging AI:** Utilizes state-of-the-art latest LLMs (Gemini 2.5, Claude Sonnet 3.7, GPT-4.1, o4 Mini, Grok 3, Deepseek via various providers) with detailed, expert-level prompting based on SEO and copywriting best practices.
+4.  **Generating Creative Titles:** Provides a list of recommended titles, comparing them against competitor titles and offering justifications for the choices and scoring.
+
+## Key Features
+
+- **AI-Powered Title Generation:** Uses LLMs to brainstorm and refine blog titles.
+- **Flexible Content Input:**
+  - Paste blog content directly.
+  - Provide a URL (content fetched via headless browser).
+  - Upload files (`.md`, `.txt`, `.pdf`, `.docx` - auto-converted to PDF internally).
+- **Competitor SERP Analysis:** Integrates with Serp API to fetch and analyze top-ranking competitor titles.
+- **Multiple LLM Support:** Choose from various models, including standard thinking/reasoning enabled models (e.g., Claude 3.7 Sonnet Thinking, Gemini 2.5 Pro Thinking).
+- **User Authentication:** Secure user management via Clerk.
+- **Persistent Chat History:** Stores past generations, accessible via an infinite-scrolling sidebar list.
+- **File Handling:** Includes client-side validation, preview, and server-side upload and conversion.
+- **Modern UI:** Built with Shadcn UI, Tailwind CSS, and Radix UI for a clean and responsive experience.
+- **Usage Limits:** Implements daily generation limits per user, reset automatically via a cron job.
+- **AI Reasoning Display:** Shows the detailed "thinking" process for LLMs.
+- **Robust Backend:** Leverages Prisma with SQLite, server-side rendering via React Router routes.
+
+## Tech Stack
+
+- **FrontEnd:**
+  - React 19
+  - React Router 7
+  - Tailwind CSS 4
+  - Shadcn UI
+  - Radix UI
+  - Vercel AI SDK
+  - SWR
+  - TypeScript
+- **Backend:**
+  - Node.js
+  - Prisma
+  - SQLite
+  - Clerk
+  - Vercel AI SDK (with Google Generative AI, Anthropic and OpenRouter providers)
+  - Playwright
+  - Pandoc
+  - AWS S3 SDK
+  - Serper API / Google CSE API (SERP Data)
+- **Tooling:**
+  - Vite
+  - PNPM
+  - ESLint
+  - Prettier
 
 ## Getting Started
 
+### Prerequisites
+
+- Node.js (v18 or later recommended)
+- PNPM (v10 or later recommended)
+- [Pandoc](https://pandoc.org/installing.html): Required for converting uploaded `.docx`, `.md`, and `.txt` files to PDF server-side. Ensure it's installed and accessible in your system's PATH.
+- [WeasyPrint](https://pypi.org/project/weasyprint/): PDF Engine for Pandoc conversions
+- Access to an S3-compatible object storage provider.
+- API Keys for:
+  - Clerk
+  - LLM Providers (Google AI Studio, Anthropic, OpenRouter)
+  - SERP Provider (Serper.dev or Google Custom Search Engine)
+
 ### Installation
 
-Install the dependencies:
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/CW-Codewalnut/retitle-iq.git
+    cd retitle-iq
+    ```
+2.  **Install dependencies:**
+    ```bash
+    pnpm install
+    ```
+
+### Environment Variables
+
+1.  Create a `.env` file in the root of the project.
+
+    ```bash
+    cp -r .env.example .env
+    ```
+
+2.  Add the corresponding environment variables.
+
+### Database Setup
+
+1.  **Sync the schema:**
+    ```bash
+    pnpm prisma db push
+    ```
+
+### Running the Development Server
 
 ```bash
-npm install
+pnpm dev
 ```
 
-### Development
+## Core Workflow: Title Generation
 
-Start the development server with HMR:
+This workflow outlines the step-by-step process from user input to the final display of the generated titles:
 
-```bash
-npm run dev
-```
+1.  **Start: User Submits Input:**
 
-Your application will be available at `http://localhost:5173`.
+    - The user interacts with the frontend, providing:
+      - A **Primary Keyword**.
+      - **Blog Content** via one of three methods: pasting text, providing a URL, or uploading a file (`.md`, `.txt`, `.pdf`, `.docx`).
+      - Selection of a specific **Language Model (LLM)**.
 
-## Building for Production
+2.  **Input Handling & Preparation:**
 
-Create a production build:
+    - The server receives the input data.
+    - **Input Extraction:** Extracts the keyword, content (text, URL, or file details), and selected LLM.
+    - **Content Type Handling:**
+      - **URL:** If a URL is provided, Playwright is used to launch a headless browser, navigate to the URL, and generate a **PDF version** of the content.
+      - **File:** If a file is uploaded:
+        - If it's not already a PDF, **Pandoc** is used server-side to convert it into PDF.
+        - The resulting PDF (original or converted) is uploaded to an S3-compatible storage (currently Supabase).
+      - **Text:** The raw text is used directly.
+    - **SERP Data Fetching:** Fetches up to 20 top Google Search Engine Results Page (SERP) results for the primary keyword using the configured provider (Serper or Google CSE - currently Serper). Results are cached in the database for a defined (currently 3 hours) duration to reduce API calls.
+    - **Database Logging:** A new `Chat` entry and the initial `Message` (containing the user's input details and file references, if any) for the logged in user (Clerk provided `userId`) are created in the database.
 
-```bash
-npm run build
-```
+3.  **LLM Prompts Construction:**
 
-## Deployment
+    - **System Prompt Assembly:** A detailed system prompt is constructed dynamically. This prompt uses **XML tags** for clear structure and separation of concerns:
+      - **`<documents>`:** An extensive research document has been prepared by LeadWalnut SEO experts outlining guidelines, proven strategies, methods, templates, and checklists for title generation. A Summarized version of this document is provided to the LLM, structured as XML.
+      - **`<instructions>`:** Contains the core task instructions, outlining the processes the LLM should perform (analyze content, analyze SERPs, score competitors, brainstorm, refine, select).
+      - **`<output_format>`:** This section defines the **required XML output structure**. It includes:
+        - Instructions for the LLM to strictly adhere to the format.
+        - Specification of outer (`<output>`) and inner tags (`<thinking>` (if applicable), `<titles>`, `<error>` (if applicable)).
+        - Detailed specification for the **JSON expected within the `<titles>` tag**, including field names (`competitorTitles`, `finalRecommendedTitles`), types, and descriptions for each field (`name`, `title`, `score`, `justification`).
+        - **Example Output:** Provides concrete examples (`<ExampleOutput>`) of the expected final XML structure for both success and error scenarios.
+      - **Model Type Adaptation:** The instructions are adjusted based on the selected model type:
+        - **Thinking Model:** Models with native reasoning capabilities are expected to naturally reason and arrive at the output.
+        - **Non-Thinking Model:** Standard models without reasoning ability are explicitly **instructed to think step by step inside a `<thinking>` tag** (thinking out loud). For this purpose, non-thinking models are provided with a sample thinking output of a thinking model.
+    - **User Input Preparation:** The user's keyword, the blog content (text or S3 URL for the PDF), and the fetched SERP results (as a JSON string) are formatted as the user message content.
+    - **Final Prompt Assembly:** The system prompts and the user message are combined into the final list of messages for the API call.
 
-### Docker Deployment
+4.  **LLM Interaction:**
 
-To build and run using Docker:
+    - The constructed prompt messages are sent to the selected LLM provider via the AI SDK's `streamText` function.
 
-```bash
-docker build -t my-app .
+5.  **AI Model Processing - Conceptual LLM Steps:**
 
-# Run the container
-docker run -p 3000:3000 my-app
-```
+    - **Analyze Blog Content:** The LLM processes the provided content.
+    - **Analyze SERP Results & Identify Gaps:** It examines the competitor data.
+    - **Score Competitor Titles:** It evaluates and scores the competitor titles based on the guidelines.
+    - **Brainstorm Diverse Title Drafts:** It generates a large number of initial title ideas.
+    - **Iteratively Refine & Self-Critique Titles:** It applies the self-critique instructions from the prompt to improve the drafts.
+    - **Select Final 6 Titles:** It chooses the best 6 titles.
+    - **Format Output:** It structures the results according to the specified `<output_format>` XML and the final JSON payload within `<titles>`.
 
-The containerized application can be deployed to any platform that supports Docker, including:
+6.  **Response Handling & Display (Streaming & Parsing):**
+    - **Stream Consumption:** The frontend `useChat` hook from AI SDK consumes the streaming response from the backend API endpoint.
+    - **Data Stream Annotations:** Additional metadata (like the model used, source blog URL, raw SERP results) is sent from the backend as annotations alongside the main text stream using `stream.writeMessageAnnotation`.
+    - **Database Update:** Upon completion of the stream (`onFinish` callback in `streamText`), the full assistant message, including the final text, parsed reasoning (if applicable), and annotations, is saved to the database.
+    - **Response Parsing:** As the API streams back the response from the LLM (formatted as XML), the FrontEnd processes it:
+      - **XML Extraction:** The FrontEnd extracts content from `<thinking>` and `<titles>` tags using regex.
+      - **Partial JSON Handling:** The content within the `<titles>` tag contains a JSON payload. When the response is streaming, this JSON might be incomplete at any given moment during the stream. To handle this, the extracted (potentially partial) JSON is passed to the `fixJson` utility (adopted from AI SDK internals). This utility fixes the partial JSON and returns a **syntactically valid JSON** which is then parsed using `JSON.parse`.
+      - **Final Output:** The parsed JSON is then used to display the final output in the UI.
+    - **Frontend Rendering:**
+      - It displays the thinking process (if available and extracted).
+      - It renders the competitor titles and their scores/justifications in a UI similar to Google results.
+      - It displays the final recommended titles in a similar UI.
+      - UI elements update progressively as the response streams and parsing occurs.
 
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
-```
-
-## Styling
-
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
-
----
-
-Built with ❤️ using React Router.
+This detailed workflow leverages structured prompting with XML, explicit output formatting examples, and robust stream parsing with JSON fixing to reliably extract and display complex, structured data from the LLM, even without leveraging first party Structured Outputs. We are intentionally avoiding structured outputs as from our testing and experience, they don't yield as good results as the free text approach for creative tasks.
