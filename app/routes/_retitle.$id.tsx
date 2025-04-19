@@ -1,5 +1,5 @@
+import { getChatMessages } from "@/workflows/retitle/.server/get-chat-messages";
 import { RetitleChat } from "@/workflows/retitle/components/chat";
-import { getChatMessages } from "@/workflows/retitle/server/get-chat-messages";
 
 import type { Route } from "./+types/_retitle.$id";
 

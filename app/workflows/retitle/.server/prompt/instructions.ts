@@ -1,7 +1,7 @@
 import {
 	RETITLE_SYS_MAIN_OUTPUT_EXAMPLE,
 	RETITLE_SYS_THINKING_OUTPUT_EXAMPLE,
-} from "@/workflows/retitle/server/prompt/examples";
+} from "./examples";
 
 export const RETITLE_SYS_INSTRUCTIONS = `
 You are an expert SEO Strategist **and** a Master Headline Writer, possessing deep knowledge of
