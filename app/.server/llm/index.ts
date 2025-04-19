@@ -1,4 +1,6 @@
+import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
 import { anthropic } from "@ai-sdk/anthropic";
+import type { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
 import { google } from "@ai-sdk/google";
 import { openrouter } from "@openrouter/ai-sdk-provider";
 import type { LanguageModel as LanguageModelV1, ProviderMetadata } from "ai";
@@ -40,15 +42,15 @@ export const modelRegistry = customProvider({
 			sendReasoning: true,
 		}),
 
-		"gpt-4o": openrouter("gpt-4o-2024-11-20"),
+		"gpt-4o": openrouter("openai/gpt-4o-2024-11-20"),
 
-		"gpt-4o-mini": openrouter("gpt-4o-mini-2024-07-18"),
+		"gpt-4o-mini": openrouter("openai/gpt-4o-mini-2024-07-18"),
 
-		"chatgpt-4o": openrouter("chatgpt-4o-latest"),
+		"chatgpt-4o": openrouter("openai/chatgpt-4o-latest"),
 
-		"gpt-4.1": openrouter("gpt-4.1-2025-04-14"),
+		"gpt-4.1": openrouter("openai/gpt-4.1"),
 
-		"gpt-4.1-mini": openrouter("gpt-4.1-mini-2025-04-14"),
+		"gpt-4.1-mini": openrouter("openai/gpt-4.1-mini"),
 
 		"deepseek-v3": openrouter("deepseek/deepseek-chat-v3-0324:free"),
 
@@ -61,22 +63,19 @@ export const modelRegistry = customProvider({
 	} satisfies Record<LanguageModel, LanguageModelV1>,
 });
 
-export function getModelSettings(
-	model: LanguageModel,
-	structuredOutputs = false,
-): {
+export function getModelSettings(model: LanguageModel): {
+	isOpenRouter?: boolean;
 	providerOptions: ProviderMetadata;
 } {
 	if (model === "sonnet-3.7-thinking") {
 		return {
 			providerOptions: {
 				anthropic: {
-					sendReasoning: true,
 					thinking: {
 						type: "enabled",
-						budgetTokens: 32000,
+						budgetTokens: 40000,
 					},
-				},
+				} satisfies AnthropicProviderOptions,
 			},
 		};
 	}
@@ -85,27 +84,51 @@ export function getModelSettings(
 		return {
 			providerOptions: {
 				anthropic: {
-					sendReasoning: false,
-				},
+					thinking: {
+						type: "disabled",
+					},
+				} satisfies AnthropicProviderOptions,
 			},
 		};
 	}
 
-	if (model.includes("gemini") && model !== "gemini-2.5-pro-thinking") {
+	if (model === "gemini-2.5-flash") {
 		return {
 			providerOptions: {
 				google: {
-					structuredOutputs,
-				},
+					thinkingConfig: {
+						thinkingBudget: 0,
+					},
+				} satisfies GoogleGenerativeAIProviderOptions,
+			},
+		};
+	}
+
+	if (model === "gemini-2.5-flash-thinking") {
+		return {
+			providerOptions: {
+				google: {
+					thinkingConfig: {
+						thinkingBudget: 20000,
+					},
+				} satisfies GoogleGenerativeAIProviderOptions,
 			},
 		};
 	}
 
 	return {
+		isOpenRouter: true,
 		providerOptions: {
 			openrouter: {
-				structuredOutputs,
+				reasoning: {
+					exclude: false,
+					effort: "medium",
+				},
+
 				transforms: ["middle-out"],
+				usage: {
+					include: true,
+				},
 			},
 		},
 	};
