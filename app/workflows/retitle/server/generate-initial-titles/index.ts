@@ -143,25 +143,13 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 
 	const chatId = newChat.id;
 
-	const modelInfo = languageModelOptions.find((m) => m.id === model);
-
-	const extraData = {
-		model: modelInfo?.name ?? null,
-		blogURL: blogURL ?? null,
-		serpResults: serpResults as JSONValue,
-	};
-
-	const systemMessages = getRetitleSystemMessages({
-		isFirstMessage: true,
-		isThinkingModel: modelInfo?.thinking ?? false,
-	});
-
 	const userMessageParts: UserContent = [];
 	if (fileUpload) {
 		userMessageParts.push({
 			type: "file",
-			data: fileUpload.url,
+			data: new URL(fileUpload.url),
 			mimeType: "application/pdf",
+			filename: fileUpload.name,
 		});
 	}
 
@@ -175,6 +163,21 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 		text: `Here is the SERP API Results (JSON): ${JSON.stringify(serpResults)}`,
 	});
 
+	const modelSettings = getModelSettings(model);
+	const langModel = modelRegistry.languageModel(model);
+	const modelInfo = languageModelOptions.find((m) => m.id === model);
+
+	const extraData = {
+		model: modelInfo?.name ?? null,
+		blogURL: blogURL ?? null,
+		serpResults: serpResults as JSONValue,
+	};
+
+	const systemMessages = getRetitleSystemMessages({
+		isFirstMessage: true,
+		isThinkingModel: modelInfo?.thinking ?? false,
+	});
+
 	const finalMessages = [
 		...systemMessages,
 		{
@@ -183,15 +186,13 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 		},
 	] satisfies CoreMessage[];
 
-	const modelSettings = getModelSettings(model);
-
 	return createDataStreamResponse({
 		execute(dataStream) {
 			dataStream.writeMessageAnnotation(extraData);
 
 			const result = streamText({
+				model: langModel,
 				messages: finalMessages,
-				model: modelRegistry.languageModel(model),
 
 				providerOptions: modelSettings?.providerOptions,
 

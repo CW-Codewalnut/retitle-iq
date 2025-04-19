@@ -3,8 +3,8 @@ import { z } from "zod";
 export const languageModels = [
 	"gemini-2.0-flash",
 	"gemini-2.0-flash-lite",
-	"gemini-2.0-flash-thinking",
-	"gemini-2.0-pro",
+	"gemini-2.5-flash",
+	"gemini-2.5-flash-thinking",
 	"gemini-2.5-pro-thinking",
 
 	"sonnet-3.5",
@@ -13,12 +13,9 @@ export const languageModels = [
 
 	"gpt-4o",
 	"gpt-4o-mini",
-	"ChatGPT-4o",
-	"o3-mini-low",
-	"o3-mini-medium",
-	"o3-mini-high",
-
-	"quasar-alpha",
+	"chatgpt-4o",
+	"gpt-4.1",
+	"gpt-4.1-mini",
 
 	"deepseek-v3",
 	"deepseek-r1",
@@ -47,13 +44,13 @@ export const languageModelOptions = [
 		name: "Gemini 2.0 Flash Lite",
 	},
 	{
-		id: "gemini-2.0-flash-thinking",
-		name: "Gemini 2.0 Flash (Reasoning)",
-		thinking: true,
+		id: "gemini-2.5-flash",
+		name: "Gemini 2.5 Flash",
 	},
 	{
-		id: "gemini-2.0-pro",
-		name: "Gemini 2.0 Pro",
+		id: "gemini-2.5-flash-thinking",
+		name: "Gemini 2.5 Flash (Reasoning)",
+		thinking: true,
 	},
 	{
 		id: "gemini-2.5-pro-thinking",
@@ -82,28 +79,16 @@ export const languageModelOptions = [
 		name: "GPT-4o Mini",
 	},
 	{
-		id: "ChatGPT-4o",
+		id: "chatgpt-4o",
 		name: "ChatGPT-4o",
 	},
-	// o3 mini doesn't support image or file inputs
-	// {
-	// 	id: "o3-mini-low",
-	// 	name: "o3 Mini (Low Reasoning)",
-	// 	thinking: true,
-	// },
-	// {
-	// 	id: "o3-mini-medium",
-	// 	name: "o3 Mini (Medium Reasoning)",
-	// 	thinking: true,
-	// },
-	// {
-	// 	id: "o3-mini-high",
-	// 	name: "o3 Mini (High Reasoning)",
-	// 	thinking: true,
-	// },
 	{
-		id: "quasar-alpha",
-		name: "Quasar Alpha",
+		id: "gpt-4.1",
+		name: "GPT-4.1",
+	},
+	{
+		id: "gpt-4.1-mini",
+		name: "GPT-4.1 Mini",
 	},
 	{
 		id: "deepseek-v3",
