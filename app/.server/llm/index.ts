@@ -2,11 +2,18 @@ import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
 import { anthropic } from "@ai-sdk/anthropic";
 import type { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
 import { google } from "@ai-sdk/google";
-import { openrouter } from "@openrouter/ai-sdk-provider";
+import { createOpenAI } from "@ai-sdk/openai";
 import type { LanguageModel as LanguageModelV1, ProviderMetadata } from "ai";
 import { customProvider } from "ai";
 
 import type { LanguageModel } from "@/utils/llm";
+
+const openrouter = createOpenAI({
+	name: "openrouter",
+	compatibility: "strict",
+	baseURL: "https://openrouter.ai/api/v1",
+	apiKey: process.env.OPENROUTER_API_KEY!,
+});
 
 export const modelRegistry = customProvider({
 	languageModels: {
@@ -52,19 +59,19 @@ export const modelRegistry = customProvider({
 
 		"gpt-4.1-mini": openrouter("openai/gpt-4.1-mini"),
 
+		"grok-3-mini": openrouter("x-ai/grok-3-mini-beta", {
+			reasoningEffort: "medium",
+		}),
+
 		"deepseek-v3": openrouter("deepseek/deepseek-chat-v3-0324:free"),
 
 		"deepseek-r1": openrouter("deepseek/deepseek-r1:free", {
-			reasoning: {
-				exclude: false,
-				effort: "medium",
-			},
+			reasoningEffort: "medium",
 		}),
 	} satisfies Record<LanguageModel, LanguageModelV1>,
 });
 
 export function getModelSettings(model: LanguageModel): {
-	isOpenRouter?: boolean;
 	providerOptions: ProviderMetadata;
 } {
 	if (model === "sonnet-3.7-thinking") {
@@ -117,7 +124,6 @@ export function getModelSettings(model: LanguageModel): {
 	}
 
 	return {
-		isOpenRouter: true,
 		providerOptions: {
 			openrouter: {
 				reasoning: {

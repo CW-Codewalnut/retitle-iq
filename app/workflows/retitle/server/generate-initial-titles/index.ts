@@ -191,6 +191,7 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 			dataStream.writeMessageAnnotation(extraData);
 
 			const result = streamText({
+				temperature: 0.8,
 				model: langModel,
 				messages: finalMessages,
 
