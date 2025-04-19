@@ -173,3 +173,9 @@ This workflow outlines the step-by-step process from user input to the final dis
       - UI elements update progressively as the response streams and parsing occurs.
 
 This detailed workflow leverages structured prompting with XML, explicit output formatting examples, and robust stream parsing with JSON fixing to reliably extract and display complex, structured data from the LLM, even without leveraging first party Structured Outputs. We are intentionally avoiding structured outputs as from our testing and experience, they don't yield as good results as the free text approach for creative tasks.
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://kgtpycqxeaittyrzcneh.supabase.co/storage/v1/object/public/ai-seo-experiments/assets/flow-chart-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="https://kgtpycqxeaittyrzcneh.supabase.co/storage/v1/object/public/ai-seo-experiments/assets/flow-chart-light.png">
+  <img alt="flow chart" src="default-image.png">
+</picture>
