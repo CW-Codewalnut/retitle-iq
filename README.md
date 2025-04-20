@@ -1,10 +1,10 @@
 # ReTitleIQ
 
-ReTitleIQ is a web application built with React, Vite, and React Router 7 designed to help users generate highly effective, SEO-optimized titles for their blog posts using Large Language Models (LLMs). It analyzes user-provided content, keyword, leverages competitor data from SERP results, and applies sophisticated prompting techniques to suggest multiple compelling title options.
+Retitle IQ is a web application built with React, Vercel AI SDK, and LLM integration created to help SEO analysts with an agentic AI assistant. The tool generates highly effective, SEO-optimized titles for the blog posts using LLMs. It analyzes the blog content, the target keyword, compares against the effective titles of competitors, and finally applies sophisticated prompting techniques to suggest multiple compelling title options.
 
 ## Overview
 
-Writing blog titles that rank well on search engines and entice humans to click is challenging. ReTitleIQ aims to simplify this process by:
+Writing blog titles that rank well on search engines and motivate human readers to click is challenging. ReTitleIQ aims to simplify this process by:
 
 1.  **Understanding Your Content:** Accepts blog content via direct text input, URL fetching, or file uploads (supporting Markdown, Text, PDF, DOCX).
 2.  **Analyzing Competition:** Fetches real-time Search Engine Results Page (SERP) data for your primary keyword to understand what's already ranking.
@@ -41,13 +41,13 @@ Writing blog titles that rank well on search engines and entice humans to click 
   - TypeScript
 - **Backend:**
   - Node.js
+  - Supabase (Storage with AWS S3 SDK)
   - Prisma
   - SQLite
   - Clerk
   - Vercel AI SDK (with Google Generative AI, Anthropic and OpenRouter providers)
   - Playwright
   - Pandoc
-  - AWS S3 SDK
   - Serper API / Google CSE API (SERP Data)
 - **Tooling:**
   - Vite
@@ -177,5 +177,5 @@ This detailed workflow leverages structured prompting with XML, explicit output 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="https://kgtpycqxeaittyrzcneh.supabase.co/storage/v1/object/public/ai-seo-experiments/assets/flow-chart-dark.png">
   <source media="(prefers-color-scheme: light)" srcset="https://kgtpycqxeaittyrzcneh.supabase.co/storage/v1/object/public/ai-seo-experiments/assets/flow-chart-light.png">
-  <img alt="flow chart" src="default-image.png">
+  <img alt="flow chart" src="https://kgtpycqxeaittyrzcneh.supabase.co/storage/v1/object/public/ai-seo-experiments/assets/flow-chart-light.png">
 </picture>
