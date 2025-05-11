@@ -1,9 +1,7 @@
-import "dotenv/config";
-
-import cron from "node-cron";
+import { Cron } from "croner";
 
 // every 24 hours
-cron.schedule("0 0 * * *", () => {
+new Cron("0 0 * * *", () => {
 	const headers = new Headers();
 	headers.append("x-cron-token", process.env.CRON_TOKEN!);
 
