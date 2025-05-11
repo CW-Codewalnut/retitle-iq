@@ -29,7 +29,14 @@ Writing blog titles that rank well on search engines and motivate human readers 
 - **Robust Backend:** Leverages Prisma with SQLite, server-side rendering via React Router routes.
 
 ## Demo
-[![demo](https://img.youtube.com/vi/fMGOHq0YcHg/0.jpg)](https://www.youtube.com/watch?v=fMGOHq0YcHg)
+<a href="https://www.youtube.com/watch?v=fMGOHq0YcHg" target="_blank" rel="noopener noreferrer">
+	<img
+		src="https://github.com/user-attachments/assets/f2528de5-342f-4812-8f7c-1428e8b83955"
+		width="640"
+		height="360"
+		alt="demo"
+	/>
+</a>
 
 Example Inputs:
 
