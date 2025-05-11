@@ -29,6 +29,7 @@ Writing blog titles that rank well on search engines and motivate human readers 
 - **Robust Backend:** Leverages Prisma with SQLite, server-side rendering via React Router routes.
 
 ## Demo
+[![demo](https://img.youtube.com/vi/fMGOHq0YcHg/0.jpg)](https://www.youtube.com/watch?v=fMGOHq0YcHg)
 
 Example Inputs:
 
@@ -116,6 +117,8 @@ bun dev
 ```
 
 ## Detailed Workflow
+
+![diagram](https://github.com/user-attachments/assets/d07c4def-64e4-44ed-9a95-4efa0befae3c)
 
 This workflow outlines the step-by-step process from user input to the final display of the generated titles.
 
