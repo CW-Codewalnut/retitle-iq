@@ -16,8 +16,8 @@ Writing blog titles that rank well on search engines and motivate human readers 
 - **AI-Powered Title Generation:** Uses LLMs to brainstorm and refine blog titles.
 - **Flexible Content Input:**
   - Paste blog content directly.
-  - Provide a URL (content fetched via headless browser).
-  - Upload files (`.md`, `.txt`, `.pdf`, `.docx` - auto-converted to PDF internally).
+  - Provide a blog URL.
+  - Upload files (`.md`, `.txt`, `.pdf`, `.docx`).
 - **Competitor SERP Analysis:** Integrates with Serp API to fetch and analyze top-ranking competitor titles.
 - **Multiple LLM Support:** Choose from various models, including standard thinking/reasoning enabled models (e.g., Claude 3.7 Sonnet Thinking, Gemini 2.5 Pro Thinking).
 - **User Authentication:** Secure user management via Clerk.
@@ -27,6 +27,18 @@ Writing blog titles that rank well on search engines and motivate human readers 
 - **Usage Limits:** Implements daily generation limits per user, reset automatically via a cron job.
 - **AI Reasoning Display:** Shows the detailed "thinking" process for LLMs.
 - **Robust Backend:** Leverages Prisma with SQLite, server-side rendering via React Router routes.
+
+## Demo
+
+Example Inputs:
+
+1. **Keyword** - seo checklist for website launch
+
+   **Blog Content** - https://www.leadwalnut.com/blog/seo-checklist-for-website-launch
+
+2. **Keyword** - react with java
+
+   **Blog Content** - https://www.codewalnut.com/learn/how-to-build-react-app-with-java-backend
 
 ## Tech Stack
 
@@ -46,12 +58,11 @@ Writing blog titles that rank well on search engines and motivate human readers 
   - SQLite
   - Clerk
   - Vercel AI SDK (with Google Generative AI, Anthropic and OpenRouter providers)
-  - Playwright
+  - Cloudflare Browser Rendering
   - Pandoc
   - Serper API / Google CSE API (SERP Data)
 - **Tooling:**
   - Vite
-  - PNPM
   - ESLint
   - Prettier
 
@@ -60,13 +71,13 @@ Writing blog titles that rank well on search engines and motivate human readers 
 ### Prerequisites
 
 - Node.js (v18 or later recommended)
-- PNPM (v10 or later recommended)
+- Bun
 - [Pandoc](https://pandoc.org/installing.html): Required for converting uploaded `.docx`, `.md`, and `.txt` files to PDF server-side. Ensure it's installed and accessible in your system's PATH.
 - [WeasyPrint](https://pypi.org/project/weasyprint/): PDF Engine for Pandoc conversions
 - Access to an S3-compatible object storage provider.
 - API Keys for:
   - Clerk
-  - LLM Providers (Google AI Studio, Anthropic, OpenRouter)
+  - LLM Providers (Google Generative AI, Anthropic, OpenRouter)
   - SERP Provider (Serper.dev or Google Custom Search Engine)
 
 ### Installation
@@ -78,7 +89,7 @@ Writing blog titles that rank well on search engines and motivate human readers 
     ```
 2.  **Install dependencies:**
     ```bash
-    pnpm install
+    bun install
     ```
 
 ### Environment Variables
@@ -95,18 +106,18 @@ Writing blog titles that rank well on search engines and motivate human readers 
 
 1.  **Sync the schema:**
     ```bash
-    pnpm prisma db push
+    bunx prisma db push
     ```
 
 ### Running the Development Server
 
 ```bash
-pnpm dev
+bun dev
 ```
 
-## Core Workflow: Title Generation
+## Detailed Workflow
 
-This workflow outlines the step-by-step process from user input to the final display of the generated titles:
+This workflow outlines the step-by-step process from user input to the final display of the generated titles.
 
 1.  **Start: User Submits Input:**
 
@@ -120,7 +131,7 @@ This workflow outlines the step-by-step process from user input to the final dis
     - The server receives the input data.
     - **Input Extraction:** Extracts the keyword, content (text, URL, or file details), and selected LLM.
     - **Content Type Handling:**
-      - **URL:** If a URL is provided, Playwright is used to launch a headless browser, navigate to the URL, and generate a **PDF version** of the content.
+      - **URL:** If a URL is provided, Cloudflare Browser Rendering API is used to generate a **PDF version** of the content.
       - **File:** If a file is uploaded:
         - If it's not already a PDF, **Pandoc** is used server-side to convert it into PDF.
         - The resulting PDF (original or converted) is uploaded to an S3-compatible storage (currently Supabase).
@@ -173,9 +184,3 @@ This workflow outlines the step-by-step process from user input to the final dis
       - UI elements update progressively as the response streams and parsing occurs.
 
 This detailed workflow leverages structured prompting with XML, explicit output formatting examples, and robust stream parsing with JSON fixing to reliably extract and display complex, structured data from the LLM, even without leveraging first party Structured Outputs. We are intentionally avoiding structured outputs as from our testing and experience, they don't yield as good results as the free text approach for creative tasks.
-
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://kgtpycqxeaittyrzcneh.supabase.co/storage/v1/object/public/ai-seo-experiments/assets/flow-chart-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="https://kgtpycqxeaittyrzcneh.supabase.co/storage/v1/object/public/ai-seo-experiments/assets/flow-chart-light.png">
-  <img alt="flow chart" src="https://kgtpycqxeaittyrzcneh.supabase.co/storage/v1/object/public/ai-seo-experiments/assets/flow-chart-light.png">
-</picture>
