@@ -1,55 +1,23 @@
-import path from "path";
-import type { LaunchOptions } from "playwright";
-import { chromium } from "playwright";
+import { cloudFlareClient } from "@/.server/cloudflare";
 
-const userDataDir = path.join(import.meta.dirname, "./.tmp/storage-state.json");
+const options = {
+	account_id: process.env.CLOUDFLARE_ACCOUNT_ID!,
+} as const;
 
-export async function getBrowserInstance(launchOptions?: LaunchOptions) {
-	const browser = await chromium.launch({
-		...launchOptions,
-		headless: true,
-		channel: "chromium",
-		args: ["--disable-blink-features=AutomationControlled"],
-	});
-
-	const context = await browser.newContext({
-		locale: "en-US",
-		deviceScaleFactor: 1,
-	});
-
-	await context.storageState({ path: userDataDir });
-	const page = await context.newPage();
-
-	return {
-		browser,
-		context,
-		page,
-	};
-}
-
-export async function getURLContent(url: string, type: "image" | "pdf") {
-	const { browser, page } = await getBrowserInstance();
-	await page.goto(url, { waitUntil: "domcontentloaded" });
-
+export async function getURLContent(url: string) {
 	console.log("Visiting URL", url);
 
 	let buffer;
 
-	if (type == "image") {
-		buffer = await page.screenshot({
-			type: "png",
-			fullPage: true,
-			animations: "disabled",
-		});
-	} else {
-		await page.emulateMedia({
-			media: "screen",
-			reducedMotion: "reduce",
-		});
-		buffer = await page.pdf();
-	}
+	const pdfResponse = await cloudFlareClient.browserRendering.pdf.create({
+		url,
+		...options,
+	});
 
-	await browser.close();
+	if (pdfResponse.ok) {
+		const arrayBuffer = await pdfResponse.arrayBuffer();
+		buffer = Buffer.from(arrayBuffer);
+	}
 
 	return buffer;
 }
