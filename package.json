@@ -3,9 +3,9 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"build": "bunx --bun react-router build",
+		"build": "react-router build",
 		"dev": "bunx --bun react-router dev",
-		"start": "bunx --bun react-router-serve ./build/server/index.js",
+		"start": "react-router-serve ./build/server/index.js",
 		"lint": "bunx --bun eslint . --cache --cache-location ./node_modules/.cache/eslint",
 		"format": "bunx --bun prettier . --ignore-path .gitignore --write --cache --cache-location ./node_modules/.cache/prettier",
 		"typecheck": "bunx --bun react-router typegen && tsc",
