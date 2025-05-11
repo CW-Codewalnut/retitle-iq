@@ -4,10 +4,14 @@ import { convertToPDF, parseUserUpload } from "@/.server/uploads";
 import type { UserUpload } from "@/utils/types";
 
 export async function uploadBlogFromURL(blogURL: string) {
-	const fileBuffer = await getURLContent(blogURL, "pdf");
+	const fileBuffer = await getURLContent(blogURL);
 
 	const fileName = "blog.pdf";
 	const mimeType = "application/pdf";
+
+	if (!fileBuffer) {
+		return null;
+	}
 
 	const fileURL = await uploadFileToStorage({
 		mimeType,

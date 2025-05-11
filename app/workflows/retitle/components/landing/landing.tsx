@@ -26,7 +26,7 @@ export function RetitleLandingComp({ id }: RetitleLandingCompProps) {
 
 		onError(error) {
 			setIsSubmited(false);
-			toast.error(error.message);
+			toast.error(error?.message?.replace("Unexpected Server Error", ""));
 		},
 
 		onFinish() {
