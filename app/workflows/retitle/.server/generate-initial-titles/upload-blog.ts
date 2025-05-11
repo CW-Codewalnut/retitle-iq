@@ -1,24 +1,60 @@
+import { db } from "@/.server/db";
 import { getURLContent } from "@/.server/headless-browser";
 import { uploadFileToStorage } from "@/.server/storage";
 import { convertToPDF, parseUserUpload } from "@/.server/uploads";
+import { WEB_PAGE_RESULT_CACHE_DURATION_HOURS } from "@/utils/constants";
 import type { UserUpload } from "@/utils/types";
 
 export async function uploadBlogFromURL(blogURL: string) {
-	const fileBuffer = await getURLContent(blogURL);
-
 	const fileName = "blog.pdf";
 	const mimeType = "application/pdf";
+	let fileURL: string | null = null;
 
-	if (!fileBuffer) {
-		return null;
-	}
+	const cacheExpiryTime = new Date();
+	cacheExpiryTime.setHours(
+		cacheExpiryTime.getHours() - WEB_PAGE_RESULT_CACHE_DURATION_HOURS,
+	);
 
-	const fileURL = await uploadFileToStorage({
-		mimeType,
-		fileName,
-		fileBuffer,
-		targetfolder: "retitle-iq",
+	const webPageResult = await db.webPageResult.findFirst({
+		where: {
+			webPageUrl: blogURL,
+			createdAt: {
+				gte: cacheExpiryTime,
+			},
+		},
 	});
+
+	if (!webPageResult) {
+		console.log("cache expired/not found", { blogURL });
+
+		const fileBuffer = await getURLContent(blogURL);
+		if (!fileBuffer) {
+			return null;
+		}
+
+		fileURL = await uploadFileToStorage({
+			mimeType,
+			fileName,
+			fileBuffer,
+			targetfolder: "retitle-iq",
+		});
+		if (!fileURL) {
+			return null;
+		}
+
+		await db.webPageResult.create({
+			data: {
+				pdfUrl: fileURL,
+				webPageUrl: blogURL,
+			},
+		});
+	} else {
+		console.log("cache found", {
+			url: blogURL,
+			createdAt: webPageResult.createdAt,
+		});
+		fileURL = webPageResult.pdfUrl;
+	}
 
 	if (!fileURL) {
 		return null;
