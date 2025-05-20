@@ -33,9 +33,7 @@ export const modelRegistry = customProvider({
 			structuredOutputs: false,
 		}),
 
-		"gemini-2.5-pro-thinking": openrouter(
-			"google/gemini-2.5-pro-preview-03-25",
-		),
+		"gemini-2.5-pro-thinking": openrouter("google/gemini-2.5-pro-preview"),
 
 		"sonnet-3.5": anthropic("claude-3-5-sonnet-20241022", {
 			sendReasoning: false,
