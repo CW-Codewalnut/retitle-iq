@@ -26,7 +26,7 @@ export const languageModels = [
 
 export type LanguageModel = (typeof languageModels)[number];
 
-export const defaultLanguageModel = "gemini-2.0-flash" satisfies LanguageModel;
+export const defaultLanguageModel = "gemini-2.5-flash" satisfies LanguageModel;
 export const languageModelSchema = z
 	.enum(languageModels)
 	.catch(defaultLanguageModel);
