@@ -1,5 +1,3 @@
-import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
-import { anthropic } from "@ai-sdk/anthropic";
 import type { GoogleGenerativeAIProviderOptions } from "@ai-sdk/google";
 import { google } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
@@ -21,31 +19,19 @@ export const modelRegistry = customProvider({
 			structuredOutputs: false,
 		}),
 
-		"gemini-2.0-flash-lite": google("gemini-2.0-flash-lite-001", {
+		"gemini-2.5-flash": google("gemini-2.5-flash-preview-05-20", {
 			structuredOutputs: false,
 		}),
 
-		"gemini-2.5-flash": google("gemini-2.5-flash-preview-04-17", {
-			structuredOutputs: false,
-		}),
-
-		"gemini-2.5-flash-thinking": google("gemini-2.5-flash-preview-04-17", {
+		"gemini-2.5-flash-thinking": google("gemini-2.5-flash-preview-05-20", {
 			structuredOutputs: false,
 		}),
 
 		"gemini-2.5-pro-thinking": openrouter("google/gemini-2.5-pro-preview"),
 
-		"sonnet-3.5": anthropic("claude-3-5-sonnet-20241022", {
-			sendReasoning: false,
-		}),
+		"sonnet-3.5": openrouter("anthropic/claude-3.5-sonnet"),
 
-		"sonnet-3.7": anthropic("claude-3-7-sonnet-20250219", {
-			sendReasoning: false,
-		}),
-
-		"sonnet-3.7-thinking": anthropic("claude-3-7-sonnet-20250219", {
-			sendReasoning: true,
-		}),
+		"sonnet-4": openrouter("anthropic/claude-sonnet-4"),
 
 		"gpt-4o": openrouter("openai/gpt-4o-2024-11-20"),
 
@@ -64,43 +50,12 @@ export const modelRegistry = customProvider({
 		"grok-3-mini": openrouter("x-ai/grok-3-mini-beta", {
 			reasoningEffort: "medium",
 		}),
-
-		"deepseek-v3": openrouter("deepseek/deepseek-chat-v3-0324:free"),
-
-		"deepseek-r1": openrouter("deepseek/deepseek-r1:free", {
-			reasoningEffort: "medium",
-		}),
 	} satisfies Record<LanguageModel, LanguageModelV1>,
 });
 
 export function getModelSettings(model: LanguageModel): {
 	providerOptions: ProviderMetadata;
 } {
-	if (model === "sonnet-3.7-thinking") {
-		return {
-			providerOptions: {
-				anthropic: {
-					thinking: {
-						type: "enabled",
-						budgetTokens: 40000,
-					},
-				} satisfies AnthropicProviderOptions,
-			},
-		};
-	}
-
-	if (model === "sonnet-3.7" || model === "sonnet-3.5") {
-		return {
-			providerOptions: {
-				anthropic: {
-					thinking: {
-						type: "disabled",
-					},
-				} satisfies AnthropicProviderOptions,
-			},
-		};
-	}
-
 	if (model === "gemini-2.5-flash") {
 		return {
 			providerOptions: {

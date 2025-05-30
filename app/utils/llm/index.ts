@@ -2,14 +2,12 @@ import { z } from "zod";
 
 export const languageModels = [
 	"gemini-2.0-flash",
-	"gemini-2.0-flash-lite",
 	"gemini-2.5-flash",
 	"gemini-2.5-flash-thinking",
 	"gemini-2.5-pro-thinking",
 
 	"sonnet-3.5",
-	"sonnet-3.7",
-	"sonnet-3.7-thinking",
+	"sonnet-4",
 
 	"gpt-4o",
 	"gpt-4o-mini",
@@ -19,9 +17,6 @@ export const languageModels = [
 	"o4-mini",
 
 	"grok-3-mini",
-
-	"deepseek-v3",
-	"deepseek-r1",
 ] as const;
 
 export type LanguageModel = (typeof languageModels)[number];
@@ -43,10 +38,6 @@ export const languageModelOptions = [
 		name: "Gemini 2.0 Flash",
 	},
 	{
-		id: "gemini-2.0-flash-lite",
-		name: "Gemini 2.0 Flash Lite",
-	},
-	{
 		id: "gemini-2.5-flash",
 		name: "Gemini 2.5 Flash",
 	},
@@ -65,13 +56,8 @@ export const languageModelOptions = [
 		name: "Claude Sonnet 3.5",
 	},
 	{
-		id: "sonnet-3.7",
-		name: "Claude Sonnet 3.7",
-	},
-	{
-		id: "sonnet-3.7-thinking",
-		name: "Claude Sonnet 3.7 (Reasoning)",
-		thinking: true,
+		id: "sonnet-4",
+		name: "Claude Sonnet 4",
 	},
 	{
 		id: "gpt-4o",
@@ -101,15 +87,6 @@ export const languageModelOptions = [
 	{
 		id: "grok-3-mini",
 		name: "Grok 3 Mini",
-		thinking: true,
-	},
-	{
-		id: "deepseek-v3",
-		name: "Deepseek V3",
-	},
-	{
-		id: "deepseek-r1",
-		name: "Deepseek R1 (Reasoning)",
 		thinking: true,
 	},
 ] satisfies ModelOption[];
