@@ -112,10 +112,6 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 		});
 
 		fileUploadId = newFileUpload.id;
-	} else {
-		throw new Error(
-			"Unable to Process WebPage/File. Please paste the content.",
-		);
 	}
 
 	const serpResults = await getSERPResults(keyword, "serper");
