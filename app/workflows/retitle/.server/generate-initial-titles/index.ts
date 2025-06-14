@@ -3,11 +3,9 @@ import type { CoreMessage, JSONValue, UserContent } from "ai";
 import { createDataStreamResponse, streamText } from "ai";
 import type { ActionFunctionArgs } from "react-router";
 
-import { getUserData } from "@/.server/auth";
 import { db } from "@/.server/db";
 import { getModelSettings, modelRegistry } from "@/.server/llm";
 import { getSERPResults } from "@/.server/llm/tools";
-import { MAX_RETITLE_GENERATIONS_PER_DAY } from "@/utils/constants";
 import { languageModelOptions } from "@/utils/llm";
 import { getURLsFromText } from "@/utils/misc";
 
@@ -28,7 +26,7 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 		);
 	}
 
-	const userData = await getUserData(userId);
+	// const userData = await getUserData(userId);
 
 	let usage = await db.usage.findUnique({
 		where: { userId },
@@ -43,18 +41,18 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 		});
 	}
 
-	if (
-		usage.retitleGenerations >= MAX_RETITLE_GENERATIONS_PER_DAY &&
-		userData.privateMetadata.role !== "admin"
-	) {
-		return Response.json(
-			{
-				status: "error",
-				message: "You have reached the maximum number of retitling per day",
-			},
-			{ status: 429 },
-		);
-	}
+	// if (
+	// 	usage.retitleGenerations >= MAX_RETITLE_GENERATIONS_PER_DAY &&
+	// 	userData.privateMetadata.role !== "admin"
+	// ) {
+	// 	return Response.json(
+	// 		{
+	// 			status: "error",
+	// 			message: "You have reached the maximum number of retitling per day",
+	// 		},
+	// 		{ status: 429 },
+	// 	);
+	// }
 
 	await db.usage.update({
 		where: { userId },
