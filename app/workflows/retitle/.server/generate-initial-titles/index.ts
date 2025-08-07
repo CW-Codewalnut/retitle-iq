@@ -1,20 +1,27 @@
 import { getAuth } from "@clerk/react-router/ssr.server";
-import type { CoreMessage, JSONValue, UserContent } from "ai";
-import { createDataStreamResponse, streamText } from "ai";
 import type { ActionFunctionArgs } from "react-router";
+import { v7 as uuidv7 } from "uuid";
+import { z } from "zod";
 
-import { db } from "@/.server/db";
-import { getModelSettings, modelRegistry } from "@/.server/llm";
-import { getSERPResults } from "@/.server/llm/tools";
-import { languageModelOptions } from "@/utils/llm";
-import { getURLsFromText } from "@/utils/misc";
+import { clerkClient } from "@/.server/auth";
 
-import { getRetitleFirstUserMessage } from "../../utils/methods";
 import { retitleInputSchema } from "../../utils/schemas";
-import { getRetitleSystemMessages } from "../prompt";
-import { uploadBlogFromFile, uploadBlogFromURL } from "./upload-blog";
+import { generateInitialTitles } from "./utils";
 
-export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
+export async function generateInitialTitlesDirectAction(
+	actionArgs: ActionFunctionArgs,
+) {
+	const id = actionArgs.params.id;
+	if (!id) {
+		return Response.json(
+			{
+				status: "error",
+				message: "Missing Id",
+			},
+			{ status: 400 },
+		);
+	}
+
 	const { userId } = await getAuth(actionArgs);
 	if (!userId) {
 		return Response.json(
@@ -26,216 +33,83 @@ export async function generateInitialTitles(actionArgs: ActionFunctionArgs) {
 		);
 	}
 
-	// const userData = await getUserData(userId);
-
-	let usage = await db.usage.findUnique({
-		where: { userId },
-		select: { retitleGenerations: true },
-	});
-
-	// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-	if (!usage) {
-		usage = await db.usage.create({
-			data: { userId },
-			select: { retitleGenerations: true },
-		});
-	}
-
-	// if (
-	// 	usage.retitleGenerations >= MAX_RETITLE_GENERATIONS_PER_DAY &&
-	// 	userData.privateMetadata.role !== "admin"
-	// ) {
-	// 	return Response.json(
-	// 		{
-	// 			status: "error",
-	// 			message: "You have reached the maximum number of retitling per day",
-	// 		},
-	// 		{ status: 429 },
-	// 	);
-	// }
-
-	await db.usage.update({
-		where: { userId },
-		data: {
-			retitleGenerations: {
-				increment: 1,
-			},
-		},
-	});
-
-	const id = actionArgs.params.id;
-	const input = (await actionArgs.request.json()) as unknown;
-
-	const inputParseResult = retitleInputSchema.safeParse(input);
-
+	const reqBody = (await actionArgs.request.json()) as unknown;
+	const inputParseResult = retitleInputSchema.safeParse(reqBody);
 	if (!inputParseResult.success) {
 		return Response.json(
 			{
 				status: "error",
 				message: "Invalid Input",
+				errors: inputParseResult.error.flatten().fieldErrors,
 			},
 			{ status: 400 },
 		);
 	}
 
-	const { keyword, model, type: inputType } = inputParseResult.data;
+	const result = await generateInitialTitles({
+		id,
+		userId,
+		responseType: "stream",
+		reqBody: inputParseResult.data,
+	});
 
-	let blogURL;
-	let fileUpload;
-	let fileUploadId;
+	return result;
+}
 
-	if (inputType === "text") {
-		const urls = getURLsFromText(inputParseResult.data.content);
-		blogURL = urls.at(0);
+const apiActionBodySchema = retitleInputSchema.and(
+	z.object({
+		email: z.string().email(),
+	}),
+);
 
-		if (blogURL) {
-			fileUpload = await uploadBlogFromURL(blogURL);
-		}
-	} else if (inputType === "file") {
-		fileUpload = await uploadBlogFromFile(inputParseResult.data.file);
+export async function generateInitialTitlesTextAPIAction(
+	actionArgs: ActionFunctionArgs,
+) {
+	const reqBody = (await actionArgs.request.json()) as unknown;
+	const inputParseResult = apiActionBodySchema.safeParse(reqBody);
+	if (!inputParseResult.success) {
+		return Response.json(
+			{
+				status: "error",
+				message: "Invalid Input",
+				errors: inputParseResult.error.flatten().fieldErrors,
+			},
+			{ status: 400 },
+		);
 	}
 
-	if (fileUpload) {
-		const newFileUpload = await db.fileUpload.create({
-			data: {
-				userId,
-				url: fileUpload.url,
-				name: fileUpload.name,
-				mimeType: fileUpload.mimeType,
-			},
-			select: {
-				id: true,
-				url: true,
-			},
-		});
-
-		fileUploadId = newFileUpload.id;
-	}
-
-	const serpResults = await getSERPResults(keyword, "serper");
-
-	const newChat = await db.chat.create({
-		data: {
-			id,
-			userId,
-			title: keyword,
-			category: "retitle",
-			messages: {
-				create: {
-					model,
-					role: "user",
-					content: getRetitleFirstUserMessage(inputParseResult.data),
-					files: fileUploadId
-						? {
-								connect: { id: fileUploadId },
-							}
-						: undefined,
-				},
-			},
-		},
-
-		select: {
-			id: true,
-		},
+	const newChatId = uuidv7();
+	void createGeneration({
+		id: newChatId,
+		reqBody: inputParseResult.data,
 	});
 
-	const chatId = newChat.id;
+	return Response.json({
+		chatId: newChatId,
+		status: "success",
+		message: "Titles generation started",
+	});
+}
 
-	const userMessageParts: UserContent = [];
-	if (fileUpload) {
-		userMessageParts.push({
-			type: "file",
-			data: new URL(fileUpload.url),
-			mimeType: "application/pdf",
-			filename: fileUpload.name,
-		});
-	}
+type CreateGenerationParams = {
+	id: string;
+	reqBody: z.infer<typeof apiActionBodySchema>;
+};
 
-	userMessageParts.push({
-		type: "text",
-		text: getRetitleFirstUserMessage(inputParseResult.data),
+async function createGeneration({ id, reqBody }: CreateGenerationParams) {
+	const newUser = await clerkClient.users.createUser({
+		emailAddress: [reqBody.email],
 	});
 
-	userMessageParts.push({
-		type: "text",
-		text: `Here is the SERP API Results (JSON): ${JSON.stringify(serpResults)}`,
+	const result = await generateInitialTitles({
+		id,
+		userId: newUser.id,
+		responseType: "text",
+		reqBody,
 	});
 
-	const modelSettings = getModelSettings(model);
-	const langModel = modelRegistry.languageModel(model);
-	const modelInfo = languageModelOptions.find((m) => m.id === model);
+	console.log("result", result);
 
-	const extraData = {
-		model: modelInfo?.name ?? null,
-		blogURL: blogURL ?? null,
-		serpResults: serpResults as JSONValue,
-	};
-
-	const systemMessages = getRetitleSystemMessages({
-		isFirstMessage: true,
-		isThinkingModel: modelInfo?.thinking ?? false,
-	});
-
-	const finalMessages = [
-		...systemMessages,
-		{
-			role: "user",
-			content: userMessageParts,
-		},
-	] satisfies CoreMessage[];
-
-	return createDataStreamResponse({
-		execute(dataStream) {
-			dataStream.writeMessageAnnotation(extraData);
-
-			const result = streamText({
-				temperature: 0.8,
-				model: langModel,
-				messages: finalMessages,
-
-				providerOptions: modelSettings?.providerOptions,
-
-				async onFinish(data) {
-					await db.message.create({
-						data: {
-							role: "assistant",
-							chatId,
-							model,
-							content: data.text,
-							reasoning: data.reasoning,
-							annotations: [extraData],
-						},
-					});
-
-					console.log("Stream Finish initial titles", chatId);
-					console.log("Usage", data.usage);
-				},
-
-				async onError(error) {
-					console.log("Error generating initial titles", error);
-
-					await db.chat.delete({
-						where: {
-							id: chatId,
-						},
-					});
-
-					await db.usage.update({
-						where: {
-							userId,
-						},
-						data: {
-							retitleGenerations: {
-								decrement: 1,
-							},
-						},
-					});
-				},
-			});
-
-			void result.consumeStream();
-
-			result.mergeIntoDataStream(dataStream);
-		},
-	});
+	// TODO: Send email to user
+	return result;
 }
