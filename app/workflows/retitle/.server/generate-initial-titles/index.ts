@@ -7,6 +7,14 @@ import { clerkClient } from "@/.server/auth";
 
 import { retitleInputSchema } from "../../utils/schemas";
 import { generateInitialTitles } from "./utils";
+import { sendEmail } from "../email/send-email";
+import { getTitlesObject } from "../../utils/parse-output";
+import { generateEmailBody } from "../email/email-template";
+
+type CreateGenerationParams = {
+	id: string;
+	reqBody: z.infer<typeof apiActionBodySchema>;
+};
 
 export async function generateInitialTitlesDirectAction(
 	actionArgs: ActionFunctionArgs,
@@ -91,25 +99,45 @@ export async function generateInitialTitlesTextAPIAction(
 	});
 }
 
-type CreateGenerationParams = {
-	id: string;
-	reqBody: z.infer<typeof apiActionBodySchema>;
-};
-
 async function createGeneration({ id, reqBody }: CreateGenerationParams) {
-	const newUser = await clerkClient.users.createUser({
+	const existingUserResponse = await clerkClient.users.getUserList({
 		emailAddress: [reqBody.email],
 	});
 
+	const existingUser = existingUserResponse.data;
+
+	let user;
+
+	if (existingUser.length > 0) {
+		user = existingUser[0];
+	} else {
+		user = await clerkClient.users.createUser({
+			emailAddress: [reqBody.email],
+			skipPasswordChecks: true,
+		});
+	}
+
 	const result = await generateInitialTitles({
 		id,
-		userId: newUser.id,
+		userId: user.id,
 		responseType: "text",
 		reqBody,
 	});
 
-	console.log("result", result);
+	const clickableLink = `${process.env.APP_URL}/${id}`;
+	const title =
+		getTitlesObject(result.generatedText)?.finalRecommendedTitles?.map(
+			(item) => item?.title || "",
+		) || [];
 
-	// TODO: Send email to user
+	const emailBody = generateEmailBody({ titles: title, clickableLink });
+
+	// Send the email to the user
+	await sendEmail({
+		to: reqBody.email,
+		subject: "Your Retitle IQ Title Suggestions Are Ready!",
+		html: emailBody,
+	});
+
 	return result;
 }
