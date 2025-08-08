@@ -4,7 +4,6 @@ import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 
 import { clerkClient } from "@/.server/auth";
-
 import { retitleInputSchema } from "../../utils/schemas";
 import { generateInitialTitles } from "./utils";
 import { sendEmail } from "../email/send-email";
@@ -15,6 +14,18 @@ type CreateGenerationParams = {
 	id: string;
 	reqBody: z.infer<typeof apiActionBodySchema>;
 };
+
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(",") || [];
+
+function setCORSHeaders(response: Response, origin: string | null) {
+	if (origin && ALLOWED_ORIGINS.includes(origin)) {
+		response.headers.set("Access-Control-Allow-Origin", origin);
+		response.headers.set("Access-Control-Allow-Methods", "POST");
+		response.headers.set("Access-Control-Allow-Headers", "Content-Type");
+	} else {
+		response.headers.set("Access-Control-Allow-Origin", "null");
+	}
+}
 
 export async function generateInitialTitlesDirectAction(
 	actionArgs: ActionFunctionArgs,
@@ -29,6 +40,11 @@ export async function generateInitialTitlesDirectAction(
 			{ status: 400 },
 		);
 	}
+
+	const origin = actionArgs.request.headers.get("Origin");
+	const response = new Response(null);
+
+	setCORSHeaders(response, origin);
 
 	const { userId } = await getAuth(actionArgs);
 	if (!userId) {
