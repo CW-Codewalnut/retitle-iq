@@ -1,14 +1,16 @@
+export interface GenerateEmailBodyParams {
+	titles: string[];
+	clickableLink: string;
+}
+
 export interface SendEmailParams {
 	to: string;
 	subject: string;
 	html: string;
 }
 
-export interface BrevoSendEmailResponse {
+export interface SendEmailResponse {
 	messageId: string;
-}
-
-export interface GenerateEmailBodyParams {
-	titles: string[];
-	clickableLink: string;
+	accepted: string[];
+	rejected: string[];
 }

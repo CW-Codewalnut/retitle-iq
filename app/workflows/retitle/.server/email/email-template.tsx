@@ -5,18 +5,23 @@ export function generateEmailBody({
 	clickableLink,
 }: GenerateEmailBodyParams): string {
 	return `
-    <div style="max-width:600px;font-family:sans-serif;color:#333;">
-      <h2 style="font-size:24px;font-weight:600;color:#1d72b8;">
-        Thanks for Using Retitle IQ!
+    <div style="max-width:600px;font-family:Arial, sans-serif;color:#333;line-height:1.5;">
+      <h2 style="font-size:22px;font-weight:600;color:#1d72b8;margin:0;">
+        Your Optimized Title List from RetitleIQ
       </h2>
       <p style="margin-top:16px;">
-        We’ve generated some title suggestions based on your recent input. Here’s what we recommend:
+        Thanks for using <strong>RetitleIQ</strong>! Based on your recent input, we’ve created a set of 
+        <strong>optimized title suggestions</strong> designed to improve your search rankings and engagement.
       </p>
-      <table style="margin-top:20px;width:100%;border-collapse:collapse;font-size:14px;">
+
+      <h3 style="font-size:18px;margin-top:20px;margin-bottom:8px;color:#444;">
+        Optimized Title Suggestions
+      </h3>
+      <table style="margin-top:8px;width:100%;border-collapse:collapse;font-size:14px;">
         <thead>
           <tr style="background-color:#f1f1f1;">
-            <th style="border:1px solid #ccc;padding:8px;text-align:left;">#</th>
-            <th style="border:1px solid #ccc;padding:8px;text-align:left;">Suggested Titles</th>
+            <th style="border:1px solid #ccc;padding:8px;text-align:left;width:40px;">#</th>
+            <th style="border:1px solid #ccc;padding:8px;text-align:left;">Suggested Title</th>
           </tr>
         </thead>
         <tbody>
@@ -32,17 +37,25 @@ export function generateEmailBody({
 						.join("")}
         </tbody>
       </table>
-      <p style="margin-top:24px;">
-        To review your title suggestions or see your previous generation history, use the link below:
-      </p>
-      <p style="text-align:center;margin-top:12px;">
-        <a href="${clickableLink}" style="font-size:18px;font-weight:600;color:#1d72b8;">
-          ${clickableLink}
-        </a>
-      </p>
-      <p style="margin-top:32px;text-align:center;font-size:12px;color:#888;">
-        If you have any questions or feedback, feel free to reply to this email. We're happy to help!
-      </p>
+        <p style="margin-top:24px;">
+          Want to see the <strong>full analysis</strong> and understand how these titles were generated? 
+          Click the link below to view the complete breakdown and your recent RetitleIQ session.
+        </p>
+
+        <p style="margin-top:12px;">
+          <a href="${clickableLink}" style="font-size:16px;color:#1d72b8;text-decoration:underline;">
+            View Full Analysis
+          </a>
+        </p>
+
+        <p style="margin-top:24px;font-size:14px;color:#333;">
+          If you have any questions or feedback, simply reply to this email we’d love to hear from you.
+        </p>
+
+        <p style="margin-top:24px;font-size:14px;color:#333;">
+          Best regards,<br>
+          <strong>LeadWalnut Team</strong>
+        </p>
     </div>
   `;
 }
