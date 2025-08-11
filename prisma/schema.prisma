@@ -32,6 +32,11 @@ model Usage {
   retitleGenerations Int    @default(0)
 }
 
+enum Source {
+  direct
+  api
+}
+
 model Chat {
   id        String   @id @default(uuid(7))
   createdAt DateTime @default(now())
@@ -41,6 +46,7 @@ model Chat {
   messages Message[]
   category ChatCategory
   userId   String
+  source   Source       @default(direct)
 }
 
 model Message {
