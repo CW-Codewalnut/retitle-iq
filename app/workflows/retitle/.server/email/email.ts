@@ -1,16 +1,16 @@
-export interface GenerateEmailBodyParams {
+export type GenerateEmailBodyParams = {
 	titles: string[];
-	clickableLink: string;
-}
+	generationLink: string;
+};
 
-export interface SendEmailParams {
+export type SendEmailParams = {
 	to: string;
 	subject: string;
 	html: string;
-}
+};
 
-export interface SendEmailResponse {
+export type SendEmailResponse = {
 	messageId: string;
 	accepted: string[];
 	rejected: string[];
-}
+};

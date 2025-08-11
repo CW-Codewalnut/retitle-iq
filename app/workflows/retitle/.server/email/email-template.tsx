@@ -2,7 +2,7 @@ import type { GenerateEmailBodyParams } from "./email";
 
 export function generateEmailBody({
 	titles,
-	clickableLink,
+	generationLink,
 }: GenerateEmailBodyParams): string {
 	return `
     <div style="max-width:600px;font-family:Arial, sans-serif;color:#333;line-height:1.5;">
@@ -43,7 +43,7 @@ export function generateEmailBody({
         </p>
 
         <p style="margin-top:12px;">
-          <a href="${clickableLink}" style="font-size:16px;color:#1d72b8;text-decoration:underline;">
+          <a href="${generationLink}" style="font-size:16px;color:#1d72b8;text-decoration:underline;">
             View Full Analysis
           </a>
         </p>

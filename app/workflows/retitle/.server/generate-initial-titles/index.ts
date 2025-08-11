@@ -4,69 +4,68 @@ import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 
 import { clerkClient } from "@/.server/auth";
-import { retitleInputSchema } from "../../utils/schemas";
-import { generateInitialTitles } from "./utils";
-import { sendEmail } from "../email/send-email";
+
+import { applyCORSHeaders, handlePreflight } from "../../utils/cors";
 import { getTitlesObject } from "../../utils/parse-output";
+import { retitleInputSchema } from "../../utils/schemas";
 import { generateEmailBody } from "../email/email-template";
+import { sendEmail } from "../email/send-email";
+import { generateInitialTitles } from "./utils";
 
 type CreateGenerationParams = {
 	id: string;
 	reqBody: z.infer<typeof apiActionBodySchema>;
 };
 
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(",") || [];
-
-function setCORSHeaders(response: Response, origin: string | null) {
-	if (origin && ALLOWED_ORIGINS.includes(origin)) {
-		response.headers.set("Access-Control-Allow-Origin", origin);
-		response.headers.set("Access-Control-Allow-Methods", "POST");
-		response.headers.set("Access-Control-Allow-Headers", "Content-Type");
-	} else {
-		response.headers.set("Access-Control-Allow-Origin", "null");
-	}
-}
-
 export async function generateInitialTitlesDirectAction(
 	actionArgs: ActionFunctionArgs,
 ) {
+	const preflight = handlePreflight(actionArgs.request);
+	if (preflight) return preflight;
+
+	const origin = actionArgs.request.headers.get("Origin");
+
 	const id = actionArgs.params.id;
 	if (!id) {
-		return Response.json(
-			{
-				status: "error",
-				message: "Missing Id",
-			},
-			{ status: 400 },
+		return applyCORSHeaders(
+			Response.json(
+				{
+					status: "error",
+					message: "Missing Id",
+				},
+				{ status: 400 },
+			),
+			origin,
 		);
 	}
 
-	const origin = actionArgs.request.headers.get("Origin");
-	const response = new Response(null);
-
-	setCORSHeaders(response, origin);
-
 	const { userId } = await getAuth(actionArgs);
 	if (!userId) {
-		return Response.json(
-			{
-				status: "error",
-				message: "You must be signed in to generate titles",
-			},
-			{ status: 401 },
+		return applyCORSHeaders(
+			Response.json(
+				{
+					status: "error",
+					message: "You must be signed in to generate titles",
+				},
+				{ status: 401 },
+			),
+			origin,
 		);
 	}
 
 	const reqBody = (await actionArgs.request.json()) as unknown;
 	const inputParseResult = retitleInputSchema.safeParse(reqBody);
 	if (!inputParseResult.success) {
-		return Response.json(
-			{
-				status: "error",
-				message: "Invalid Input",
-				errors: inputParseResult.error.flatten().fieldErrors,
-			},
-			{ status: 400 },
+		return applyCORSHeaders(
+			Response.json(
+				{
+					status: "error",
+					message: "Invalid Input",
+					errors: inputParseResult.error.flatten().fieldErrors,
+				},
+				{ status: 400 },
+			),
+			origin,
 		);
 	}
 
@@ -77,7 +76,11 @@ export async function generateInitialTitlesDirectAction(
 		reqBody: inputParseResult.data,
 	});
 
-	return result;
+	if (result instanceof Response) {
+		return applyCORSHeaders(result, origin);
+	}
+
+	return applyCORSHeaders(Response.json(result, { status: 200 }), origin);
 }
 
 const apiActionBodySchema = retitleInputSchema.and(
@@ -140,13 +143,13 @@ async function createGeneration({ id, reqBody }: CreateGenerationParams) {
 		reqBody,
 	});
 
-	const clickableLink = `${process.env.APP_URL}/${id}`;
+	const generationLink = `${process.env.APP_URL}/${id}`;
 	const title =
 		getTitlesObject(result.generatedText)?.finalRecommendedTitles?.map(
-			(item) => item?.title || "",
-		) || [];
+			(item) => item?.title ?? "",
+		) ?? [];
 
-	const emailBody = generateEmailBody({ titles: title, clickableLink });
+	const emailBody = generateEmailBody({ titles: title, generationLink });
 
 	// Send the email to the user
 	await sendEmail({
