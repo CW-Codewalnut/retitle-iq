@@ -1,14 +1,25 @@
 import nodemailer from "nodemailer";
+
 import type { SendEmailParams, SendEmailResponse } from "./email";
+
+const SMTP_PASS = process.env.SMTP_PASS;
+const SMTP_USER = process.env.SMTP_USER;
+
+const transporter = nodemailer.createTransport({
+	host: "smtp.gmail.com",
+	port: 587,
+	secure: false,
+	auth: {
+		user: SMTP_USER,
+		pass: SMTP_PASS,
+	},
+});
 
 export async function sendEmail({
 	to,
 	subject,
 	html,
-}: SendEmailParams): Promise<SendEmailResponse> {
-	const SMTP_PASS = process.env.SMTP_PASS;
-	const SMTP_USER = process.env.SMTP_USER;
-
+}: SendEmailParams): Promise<SendEmailResponse | undefined> {
 	if (!SMTP_USER || !SMTP_PASS) {
 		throw new Error(
 			"SMTP credentials are missing. Please set SMTP_USER and SMTP_PASS.",
@@ -16,16 +27,6 @@ export async function sendEmail({
 	}
 
 	try {
-		const transporter = nodemailer.createTransport({
-			host: "smtp.gmail.com",
-			port: 587,
-			secure: false,
-			auth: {
-				user: SMTP_USER,
-				pass: SMTP_PASS,
-			},
-		});
-
 		const info = await transporter.sendMail({
 			from: `"Retitle IQ" <${SMTP_USER}>`,
 			to,
@@ -39,6 +40,6 @@ export async function sendEmail({
 			rejected: info.rejected.map(String),
 		};
 	} catch (error) {
-		throw new Error("Failed to send email. Please try again later.");
+		console.log(error);
 	}
 }
