@@ -92,16 +92,22 @@ const apiActionBodySchema = retitleInputSchema.and(
 export async function generateInitialTitlesTextAPIAction(
 	actionArgs: ActionFunctionArgs,
 ) {
+	const preflight = handlePreflight(actionArgs.request);
+	if (preflight) return preflight;
+	const origin = actionArgs.request.headers.get("Origin");
 	const reqBody = (await actionArgs.request.json()) as unknown;
 	const inputParseResult = apiActionBodySchema.safeParse(reqBody);
 	if (!inputParseResult.success) {
-		return Response.json(
-			{
-				status: "error",
-				message: "Invalid Input",
-				errors: inputParseResult.error.flatten().fieldErrors,
-			},
-			{ status: 400 },
+		return applyCORSHeaders(
+			Response.json(
+				{
+					status: "error",
+					message: "Invalid Input",
+					errors: inputParseResult.error.flatten().fieldErrors,
+				},
+				{ status: 400 },
+			),
+			origin,
 		);
 	}
 
@@ -111,11 +117,14 @@ export async function generateInitialTitlesTextAPIAction(
 		reqBody: inputParseResult.data,
 	});
 
-	return Response.json({
-		chatId: newChatId,
-		status: "success",
-		message: "Titles generation started",
-	});
+	return applyCORSHeaders(
+		Response.json({
+			chatId: newChatId,
+			status: "success",
+			message: "Titles generation started",
+		}),
+		origin,
+	);
 }
 
 async function createGeneration({ id, reqBody }: CreateGenerationParams) {
