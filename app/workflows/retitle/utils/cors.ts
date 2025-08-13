@@ -1,8 +1,13 @@
-const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(",") ?? [];
+const ALLOWED_ORIGINS =
+	process.env.ALLOWED_ORIGINS?.split(",").map((origin) =>
+		origin.trim().replace(/\/+$/, ""),
+	) ?? [];
 
 export function applyCORSHeaders(response: Response, origin: string | null) {
-	if (origin && ALLOWED_ORIGINS.includes(origin)) {
-		response.headers.set("Access-Control-Allow-Origin", origin);
+	const sanitizedOrigin = origin?.replace(/\/+$/, "");
+
+	if (sanitizedOrigin && ALLOWED_ORIGINS.includes(sanitizedOrigin)) {
+		response.headers.set("Access-Control-Allow-Origin", origin!);
 		response.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
 		response.headers.set(
 			"Access-Control-Allow-Headers",
