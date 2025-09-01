@@ -89,7 +89,7 @@ export async function generateInitialTitlesTextAPIAction(
 				errors: inputParseResult.error.flatten().fieldErrors,
 			}),
 			{
-				origin: true,
+				origin: process.env.ALLOWED_ORIGINS?.split(","),
 				methods: ["POST", "OPTIONS"],
 			},
 		);
@@ -109,7 +109,7 @@ export async function generateInitialTitlesTextAPIAction(
 			message: "Titles generation started",
 		}),
 		{
-			origin: true,
+			origin: process.env.ALLOWED_ORIGINS?.split(","),
 			methods: ["POST", "OPTIONS"],
 		},
 	);
