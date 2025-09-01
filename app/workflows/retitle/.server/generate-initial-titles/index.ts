@@ -90,6 +90,7 @@ export async function generateInitialTitlesTextAPIAction(
 			}),
 			{
 				origin: true,
+				methods: ["POST", "OPTIONS"],
 			},
 		);
 	}
@@ -100,7 +101,7 @@ export async function generateInitialTitlesTextAPIAction(
 		reqBody: inputParseResult.data,
 	});
 
-	return cors(
+	return await cors(
 		actionArgs.request,
 		Response.json({
 			chatId: newChatId,
@@ -109,6 +110,7 @@ export async function generateInitialTitlesTextAPIAction(
 		}),
 		{
 			origin: true,
+			methods: ["POST", "OPTIONS"],
 		},
 	);
 }
