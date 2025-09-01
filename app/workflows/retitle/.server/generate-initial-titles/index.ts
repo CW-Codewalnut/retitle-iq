@@ -1,5 +1,6 @@
 import { getAuth } from "@clerk/react-router/ssr.server";
 import type { ActionFunctionArgs } from "react-router";
+import { cors } from "remix-utils/cors";
 import { v7 as uuidv7 } from "uuid";
 import { z } from "zod";
 
@@ -80,13 +81,16 @@ export async function generateInitialTitlesTextAPIAction(
 	const reqBody = (await actionArgs.request.json()) as unknown;
 	const inputParseResult = apiActionBodySchema.safeParse(reqBody);
 	if (!inputParseResult.success) {
-		return Response.json(
-			{
+		return await cors(
+			actionArgs.request,
+			Response.json({
 				status: "error",
 				message: "Invalid Input",
 				errors: inputParseResult.error.flatten().fieldErrors,
+			}),
+			{
+				origin: true,
 			},
-			{ status: 400 },
 		);
 	}
 
@@ -96,11 +100,17 @@ export async function generateInitialTitlesTextAPIAction(
 		reqBody: inputParseResult.data,
 	});
 
-	return Response.json({
-		chatId: newChatId,
-		status: "success",
-		message: "Titles generation started",
-	});
+	return cors(
+		actionArgs.request,
+		Response.json({
+			chatId: newChatId,
+			status: "success",
+			message: "Titles generation started",
+		}),
+		{
+			origin: true,
+		},
+	);
 }
 
 async function createGeneration({ id, reqBody }: CreateGenerationParams) {
