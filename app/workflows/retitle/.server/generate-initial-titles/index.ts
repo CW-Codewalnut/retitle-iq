@@ -5,7 +5,6 @@ import { z } from "zod";
 
 import { clerkClient } from "@/.server/auth";
 
-import { applyCORSHeaders, handlePreflight } from "../../utils/cors";
 import { getTitlesObject } from "../../utils/parse-output";
 import { retitleInputSchema } from "../../utils/schemas";
 import { generateEmailBody } from "../email/email-template";
@@ -20,52 +19,38 @@ type CreateGenerationParams = {
 export async function generateInitialTitlesDirectAction(
 	actionArgs: ActionFunctionArgs,
 ) {
-	const preflight = handlePreflight(actionArgs.request);
-	if (preflight) return preflight;
-
-	const origin = actionArgs.request.headers.get("Origin");
-
 	const id = actionArgs.params.id;
 	if (!id) {
-		return applyCORSHeaders(
-			Response.json(
-				{
-					status: "error",
-					message: "Missing Id",
-				},
-				{ status: 400 },
-			),
-			origin,
+		return Response.json(
+			{
+				status: "error",
+				message: "Missing Id",
+			},
+			{ status: 400 },
 		);
 	}
 
 	const { userId } = await getAuth(actionArgs);
 	if (!userId) {
-		return applyCORSHeaders(
-			Response.json(
-				{
-					status: "error",
-					message: "You must be signed in to generate titles",
-				},
-				{ status: 401 },
-			),
-			origin,
+		return Response.json(
+			{
+				status: "error",
+				message: "You must be signed in to generate titles",
+			},
+			{ status: 401 },
 		);
 	}
 
 	const reqBody = (await actionArgs.request.json()) as unknown;
 	const inputParseResult = retitleInputSchema.safeParse(reqBody);
 	if (!inputParseResult.success) {
-		return applyCORSHeaders(
-			Response.json(
-				{
-					status: "error",
-					message: "Invalid Input",
-					errors: inputParseResult.error.flatten().fieldErrors,
-				},
-				{ status: 400 },
-			),
-			origin,
+		return Response.json(
+			{
+				status: "error",
+				message: "Invalid Input",
+				errors: inputParseResult.error.flatten().fieldErrors,
+			},
+			{ status: 400 },
 		);
 	}
 
@@ -77,10 +62,10 @@ export async function generateInitialTitlesDirectAction(
 	});
 
 	if (result instanceof Response) {
-		return applyCORSHeaders(result, origin);
+		return result;
 	}
 
-	return applyCORSHeaders(Response.json(result, { status: 200 }), origin);
+	return Response.json(result, { status: 200 });
 }
 
 const apiActionBodySchema = retitleInputSchema.and(
@@ -92,22 +77,16 @@ const apiActionBodySchema = retitleInputSchema.and(
 export async function generateInitialTitlesTextAPIAction(
 	actionArgs: ActionFunctionArgs,
 ) {
-	const preflight = handlePreflight(actionArgs.request);
-	if (preflight) return preflight;
-	const origin = actionArgs.request.headers.get("Origin");
 	const reqBody = (await actionArgs.request.json()) as unknown;
 	const inputParseResult = apiActionBodySchema.safeParse(reqBody);
 	if (!inputParseResult.success) {
-		return applyCORSHeaders(
-			Response.json(
-				{
-					status: "error",
-					message: "Invalid Input",
-					errors: inputParseResult.error.flatten().fieldErrors,
-				},
-				{ status: 400 },
-			),
-			origin,
+		return Response.json(
+			{
+				status: "error",
+				message: "Invalid Input",
+				errors: inputParseResult.error.flatten().fieldErrors,
+			},
+			{ status: 400 },
 		);
 	}
 
@@ -117,14 +96,11 @@ export async function generateInitialTitlesTextAPIAction(
 		reqBody: inputParseResult.data,
 	});
 
-	return applyCORSHeaders(
-		Response.json({
-			chatId: newChatId,
-			status: "success",
-			message: "Titles generation started",
-		}),
-		origin,
-	);
+	return Response.json({
+		chatId: newChatId,
+		status: "success",
+		message: "Titles generation started",
+	});
 }
 
 async function createGeneration({ id, reqBody }: CreateGenerationParams) {
