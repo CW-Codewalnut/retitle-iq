@@ -23,6 +23,10 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Setup environment variables
+        run: |
+          echo "DATABASE_URL=file:./prisma/test.db" >> $GITHUB_ENV
+
       - name: Sync database
         run: bunx prisma db push
 
@@ -39,3 +43,12 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: test-results/
+          retention-days: 30
+          if-no-files-found: ignore
