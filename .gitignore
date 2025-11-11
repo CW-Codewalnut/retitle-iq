@@ -10,3 +10,17 @@
 .env.prod
 
 prisma/*.db
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/playwright/.temp/
+/playwright/screenshots/
+/playwright/videos/
+/playwright-traces/
+/playwright-debug.log
+node_modules/
+.cache/

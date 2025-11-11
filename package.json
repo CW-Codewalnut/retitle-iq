@@ -10,7 +10,11 @@
 		"format": "bunx --bun prettier . --ignore-path .gitignore --write --cache --cache-location ./node_modules/.cache/prettier",
 		"typecheck": "bunx --bun react-router typegen && tsc",
 		"fun": "bun format && bun typecheck && bun lint",
-		"cron": "bun run cron/index.ts"
+		"cron": "bun run cron/index.ts",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:headed": "playwright test --headed",
+		"test:e2e:debug": "playwright test --debug"
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "^1.2.11",
@@ -58,6 +62,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^9.26.0",
+		"@playwright/test": "^1.56.1",
 		"@react-router/dev": "^7.6.0",
 		"@tailwindcss/typography": "^0.5.16",
 		"@tailwindcss/vite": "^4.1.6",
