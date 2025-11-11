@@ -71,7 +71,11 @@ export default defineConfig({
 
 	/* Run your local dev server before starting the tests */
 	webServer: {
-		command: "bun run dev",
+		command: `CLERK_PUBLISHABLE_KEY=${process.env.CLERK_PUBLISHABLE_KEY} \
+              VITE_CLERK_PUBLISHABLE_KEY=${process.env.VITE_CLERK_PUBLISHABLE_KEY} \
+              CLERK_SECRET_KEY=${process.env.CLERK_SECRET_KEY} \
+              DATABASE_URL=${process.env.DATABASE_URL} \
+              bun run dev`,
 		url: "http://localhost:5173",
 		reuseExistingServer: !process.env.CI,
 		timeout: 120 * 1000,
